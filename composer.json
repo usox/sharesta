@@ -1,0 +1,22 @@
+{
+    "name": "usox/sharesta",
+    "description": "restful json api creation using hack",
+    "type": "library",
+    "keywords": ["json", "hack", "hhvm", "api", "restful"],
+    "license": "MIT",
+    "authors": [
+	{
+	    "name": "Daniel Jakob",
+	    "email": "dev@usox.org"
+	}
+    ],
+    "require-dev": {
+	    "phpunit/phpunit": "5.*",
+	    "mockery/mockery": "0.*"
+    },
+    "autoload": {
+        "psr-4": {
+	    "Usox\\Sharesta\\": "src"
+        }
+    }
+}
