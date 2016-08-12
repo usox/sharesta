@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/usox/sharesta.svg?branch=master)](https://travis-ci.org/usox/sharesta)
+
 # Sharesta - Strict HAck RESTful Apis
 
 A micro framework to build simple and easy to use rest-like apis - written in
