@@ -1,4 +1,6 @@
 <?hh // decl
+namespace Usox\Sharesta\Example;
+
 require_once '../../vendor/autoload.php';
 
 use Usox\Sharesta\Exception;
