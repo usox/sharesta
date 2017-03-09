@@ -58,12 +58,12 @@ final class Request implements RequestInterface {
 	public function getUriValues(): Map<string,string> {
 		return $this->uri_values;
 	}
-	
+
 	public function getBodyAsJson(): string {
-		return json_encode($this->request_body->getBody()); 
+		return json_encode($this->request_body->getBody());
 	}
 
-	public function getBody(): Map<string,string> {
+	public function getBody(): Map<string,mixed> {
 		return $this->request_body->getBody();
 	}
 }

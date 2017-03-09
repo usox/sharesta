@@ -12,8 +12,8 @@ interface RequestInterface {
 	public function getRouteParameters(): Map<string,string>;
 
 	public function getUriValues(): Map<string,string>;
-	
+
 	public function getBodyAsJson(): string;
 
-	public function getBody(): Map<string,string>;
+	public function getBody(): Map<string,mixed>;
 }
