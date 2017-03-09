@@ -1,15 +1,10 @@
-<?hh // decl
+<?hh // partial
 namespace Usox\Sharesta\Example;
 
 require_once '../../vendor/autoload.php';
 
-use Usox\Sharesta\Exception;
+use Usox\Sharesta\ApiFactory;
 use Usox\Sharesta\RequestInterface;
-use Usox\Sharesta\Request;
-use Usox\Sharesta\RequestBody;
-use Usox\Sharesta\Router;
-use Usox\Sharesta\Application;
-use Usox\Sharesta\Response;
 use Usox\Sharesta\RouterInterface;
 use Usox\Sharesta\RoutesInterface;
 
@@ -22,6 +17,8 @@ class HomeRoute implements \JsonSerializable {
 
 class GetSomeIdRoute implements \JsonSerializable {
 
+	private ?string $request_id;
+
 	public function __construct(private RequestInterface $request): void {
 	}
 
@@ -30,17 +27,17 @@ class GetSomeIdRoute implements \JsonSerializable {
 	}
 
 	public function jsonSerialize(): string {
-		return 'Got '.$this->request_id;
+		return 'Got '.(string) $this->request_id;
 	}
 }
 
 class Routes implements RoutesInterface {
 
 	public function registerRoutes(RouterInterface $router): void {
-		$router->get('/', function (Request $request) {
+		$router->get('/', function (RequestInterface $request) {
 			return new HomeRoute();
 		});
-		$router->get('/get_some/:id', function (Request $request) {
+		$router->get('/get_some/:id', function (RequestInterface $request) {
 			$route = new GetSomeIdRoute($request);
 			$route->doSomeFancyMagic();
 			return $route;
@@ -50,32 +47,22 @@ class Routes implements RoutesInterface {
 
 function init() {
 
-	$router = new Router();
+	$factory = new ApiFactory();
 	$routes = new Routes();
+
+	$router = $factory->createRouter();
 
 	$routes->registerRoutes($router);
 
-	$request = new Request(
+	$request = $factory->createRequest(
 		'TEST/example/webroot',
 		new Map($_SERVER),
 		new Map($_GET),
-		new RequestBody()
 	);
-	$app = new Usox\Sharesta\Application(
+	$factory->createApplication(
 		$request,
 		$router
-	);
-	try {
-		$app->execute();
-	} catch (Exception\NotFoundException $e) {
-		$response = new Response();
-		$response->send(404, $e->getMessage());
-	} catch (Exception\RequestException $e) {
-		$response = new Response();
-		$response->send(400, $e->getMessage());
-	} catch (Exception\ServerException $e) {
-		$response = new Response();
-		$response->send(500, $e->getMessage());
-	}
+	)
+	->handle();
 }
 init();
