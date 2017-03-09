@@ -10,6 +10,8 @@ use Usox\Sharesta\RequestBody;
 use Usox\Sharesta\Router;
 use Usox\Sharesta\Application;
 use Usox\Sharesta\Response;
+use Usox\Sharesta\RouterInterface;
+use Usox\Sharesta\RoutesInterface;
 
 class HomeRoute implements \JsonSerializable {
 
@@ -32,9 +34,9 @@ class GetSomeIdRoute implements \JsonSerializable {
 	}
 }
 
-class Routes implements \Usox\Sharesta\RoutesInterface {
+class Routes implements RoutesInterface {
 
-	public function registerRoutes(\Usox\Sharesta\RouterInterface $router): void {
+	public function registerRoutes(RouterInterface $router): void {
 		$router->get('/', function (Request $request) {
 			return new HomeRoute();
 		});
@@ -48,19 +50,22 @@ class Routes implements \Usox\Sharesta\RoutesInterface {
 
 function init() {
 
+	$router = new Router();
+	$routes = new Routes();
+
+	$routes->registerRoutes($router);
+
+	$request = new Request(
+		'TEST/example/webroot',
+		new Map($_SERVER),
+		new Map($_GET),
+		new RequestBody()
+	);
+	$app = new Usox\Sharesta\Application(
+		$request,
+		$router
+	);
 	try {
-		$request = new Request(
-			'TEST/example/webroot',
-			new Map($_SERVER),
-			new Map($_GET),
-			new RequestBody()
-		);
-		$app = new Usox\Sharesta\Application(
-			$request,
-			new Router(),
-			new Routes()
-		);
-		$app->init();
 		$app->execute();
 	} catch (Exception\NotFoundException $e) {
 		$response = new Response();

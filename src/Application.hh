@@ -5,13 +5,8 @@ final class Application implements ApplicationInterface {
 
 	public function __construct(
 		private RequestInterface $request,
-		private RouterInterface $router,
-		private RoutesInterface $routes
-	) {
-	}
-
-	public function init(): void {
-		$this->routes->registerRoutes($this->router);
+		private RouterInterface $router
+	): void {
 	}
 
 	public function execute(): void {
