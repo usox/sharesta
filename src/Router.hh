@@ -39,8 +39,8 @@ final class Router implements RouterInterface {
 		return $this->route_parameters;
 	}
 
-	public function matchRequest(RequestInterface $request): (function (RequestInterface): \JsonSerializable) {
-		$requested_route = $request->getRoute();
+	private function matchRequest(RequestInterface $request, string $base_path): (function (RequestInterface): \JsonSerializable) {
+		$requested_route = $request->getRoute($base_path);
 		$http_method = $request->getHttpMethod();
 
 		foreach ($this->routes as $route => $callback) {
@@ -75,5 +75,17 @@ final class Router implements RouterInterface {
 			}
 		}
 		throw new Exception\ServerException('The requested resource was not found');
+	}
+
+	public function route(RequestInterface $request, string $base_path): mixed {
+		$callable = $this->matchRequest($request, $base_path);
+		if ($callable === null) {
+			throw new Exception\NotFoundException('The requested resource was not found');
+		}
+
+		if (!is_callable($callable)) {
+			throw new Exception\ServerException('The provided route callback is not callable');
+		}
+		return $callable($request);
 	}
 }

@@ -10,15 +10,20 @@ final class Application implements ApplicationInterface {
 	): void {
 	}
 
-	public function handle(): void {
+	public function handle(string $base_path): void {
 		try {
-			$this->handleRequest();
+			$this->sendResponse(
+				200,
+				$this->router->route($this->request, $base_path)
+			);
 		} catch (Exception\NotFoundException $e) {
 			$this->sendResponse(404, $e->getMessage());
 		} catch (Exception\RequestException $e) {
 			$this->sendResponse(400, $e->getMessage());
 		} catch (Exception\ServerException $e) {
 			$this->sendResponse(500, $e->getMessage());
+		} catch (\Exception $e) {
+			$this->sendResponse(500, 'Internal server error');
 		}
 	}
 
@@ -26,18 +31,5 @@ final class Application implements ApplicationInterface {
 		$this->api_factory
 			->createResponse($status_code, $body)
 			->send();	
-	}
-
-	private function handleRequest(): void {
-		$callable = $this->router->matchRequest($this->request);
-		if ($callable === null) {
-			throw new Exception\NotFoundException('The requested resource was not found');
-		}
-		$this->request->setRouteParameters($this->router->getRouteParameters());
-
-		if (!is_callable($callable)) {
-			throw new Exception\ServerException('The provided route callback is not callable');
-		}
-		$this->sendResponse(200, $callable($this->request));
 	}
 }

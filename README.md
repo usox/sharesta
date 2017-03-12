@@ -35,7 +35,7 @@ Now bootstrap sharesta, register your routes and let the application controller 
 	$routes->registerRoutes($router);
 
 	$request = $factory->createRequest(
-		'PATH/TO/THIS/FILE',
+		$router,
 		new Map($_SERVER),
 		new Map($_GET),
 	);
@@ -43,7 +43,9 @@ Now bootstrap sharesta, register your routes and let the application controller 
 		$request,
 		$router
 	)
-	->handle();
+	->handle(
+		'index.hh' // path to the file
+	);
 ```
 
 ## Example

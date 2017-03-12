@@ -3,11 +3,9 @@ namespace Usox\Sharesta;
 
 interface RequestInterface {
 
-	public function getRoute(): string;
+	public function getRoute(string $base_path): string;
 
 	public function getHttpMethod(): string;
-
-	public function setRouteParameters(Map<string,string> $parameters): void;
 
 	public function getRouteParameters(): Map<string,string>;
 

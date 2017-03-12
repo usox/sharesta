@@ -4,7 +4,9 @@ namespace Usox\Sharesta;
 class RouterTest extends \PHPUnit_Framework_TestCase {   
 
 	public function setUp() {
-		$this->callable = function(Request $request): \JsonSerializable { return \Mockery::mock(\JsonSerializable::class); };
+		$this->result = \Mockery::mock(\JsonSerializable::class);
+		$this->callable = function(RequestInterface $request): \JsonSerializable { return $this->result; };
+		$this->base_path = 'some-nice-path';
 	}
 
 	public function testRouterMatchesRequestCorrectly() {
@@ -13,8 +15,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		$router->register('users/:id/:field', $this->callable);
 
 		$this->assertSame(
-			$this->callable,
-			$router->matchRequest($this->createRequest('users/12/name', 'GET'))
+			$this->result,
+			$router->route($this->createRequest('users/12/name', 'GET'), $this->base_path)
 		);
 	}
 
@@ -26,7 +28,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		$router = new Router();
 
 		$router->register('foo/:id/:field', $this->callable);
-		$router->matchRequest($this->createRequest('/api/users/12/name', 'GET'));
+		$router->route($this->createRequest('/api/users/12/name', 'GET'), $this->base_path);
 	}
 
 	public function testRouterMatchesSpecificHTTPMethodCorrectly() {
@@ -37,10 +39,10 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		$router->register('puttest/:id/:field', $this->callable, 'PUT');
 		$router->register('deltest/:id/:field', $this->callable, 'DELETE');
 
-		$this->assertSame($this->callable, $router->matchRequest($this->createRequest('gettest/12/name', 'GET')));
-		$this->assertSame($this->callable, $router->matchRequest($this->createRequest('posttest/12/name', 'POST')));
-		$this->assertSame($this->callable, $router->matchRequest($this->createRequest('puttest/12/name', 'PUT')));
-		$this->assertSame($this->callable, $router->matchRequest($this->createRequest('deltest/12/name', 'DELETE')));
+		$this->assertSame($this->result, $router->route($this->createRequest('gettest/12/name', 'GET'), $this->base_path));
+		$this->assertSame($this->result, $router->route($this->createRequest('posttest/12/name', 'POST'), $this->base_path));
+		$this->assertSame($this->result, $router->route($this->createRequest('puttest/12/name', 'PUT'), $this->base_path));
+		$this->assertSame($this->result, $router->route($this->createRequest('deltest/12/name', 'DELETE'), $this->base_path));
 	}
 
 	public function testRouterMatchesSpecificHTTPMethodCorrectlyUsingShortcuts() {
@@ -51,17 +53,17 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		$router->put('puttest/:id/:field', $this->callable);
 		$router->delete('deltest/:id/:field', $this->callable);
 
-		$this->assertSame($this->callable, $router->matchRequest($this->createRequest('gettest/12/name', 'GET')));
-		$this->assertSame($this->callable, $router->matchRequest($this->createRequest('posttest/12/name', 'POST')));
-		$this->assertSame($this->callable, $router->matchRequest($this->createRequest('puttest/12/name', 'PUT')));
-		$this->assertSame($this->callable, $router->matchRequest($this->createRequest('deltest/12/name', 'DELETE')));
+		$this->assertSame($this->result, $router->route($this->createRequest('gettest/12/name', 'GET'), $this->base_path));
+		$this->assertSame($this->result, $router->route($this->createRequest('posttest/12/name', 'POST'), $this->base_path));
+		$this->assertSame($this->result, $router->route($this->createRequest('puttest/12/name', 'PUT'), $this->base_path));
+		$this->assertSame($this->result, $router->route($this->createRequest('deltest/12/name', 'DELETE'), $this->base_path));
 	}
 
 	public function testRouterObtainsRouteParamsCorrectly() {
 		$router = new Router();
 
 		$router->register('users/:id/:field', $this->callable);
-		$router->matchRequest($this->createRequest('users/12/name', 'GET'));
+		$router->route($this->createRequest('users/12/name', 'GET'), $this->base_path);
 		$routeParams = $router->getRouteParameters();
 
 		$this->assertEquals($routeParams->get('id'), '12');

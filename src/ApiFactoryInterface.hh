@@ -6,7 +6,7 @@ interface ApiFactoryInterface {
 	public function createRouter(): RouterInterface;
 
 	public function createRequest(
-		string $path,
+		RouterInterface $router,
 		Map<string,string> $get_vars,
 		Map<string,string> $server_vars
 	): RequestInterface;

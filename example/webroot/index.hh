@@ -46,23 +46,22 @@ class Routes implements RoutesInterface {
 }
 
 function init() {
-
 	$factory = new ApiFactory();
-	$routes = new Routes();
 
 	$router = $factory->createRouter();
-
-	$routes->registerRoutes($router);
-
 	$request = $factory->createRequest(
-		'TEST/example/webroot',
+		$router,
 		new Map($_SERVER),
 		new Map($_GET),
 	);
+
+	$routes = new Routes();
+	$routes->registerRoutes($router);
+
 	$factory->createApplication(
 		$request,
 		$router
 	)
-	->handle();
+	->handle('/PATH/TO/BASEDIR');
 }
 init();

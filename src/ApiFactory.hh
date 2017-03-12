@@ -8,12 +8,12 @@ final class ApiFactory implements ApiFactoryInterface {
 	}
 
 	public function createRequest(
-		string $path,
+		RouterInterface $router,
 		Map<string,string> $get_vars,
 		Map<string,string> $server_vars
 	): RequestInterface {
 		return new Request(
-			$path,
+			$router,
 			$get_vars,
 			$server_vars,
 			new RequestBody()

@@ -1,4 +1,4 @@
-<?hh
+<?hh // partial
 namespace Usox\Sharesta;
 
 use Mockery as m;
@@ -10,6 +10,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 		$this->request = m::mock(RequestInterface::class);
 		$this->router = m::mock(RouterInterface::class);
 
+		$this->base_path = 'a-nice-path';
+
 		$this->application = new Application(
 			$this->api_factory,
 			$this->request,
@@ -17,93 +19,53 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
-	public function testHandleSendsNotFoundResponse() {
-		$this->setExpectedResponse(404, 'The requested resource was not found');
+	/**
+	 * @dataProvider handleDataProvider
+	 */
+	public function testHandleCreatesCorrectResponse(
+		int $status_code,
+		string $exception_class,
+		string $error_message
+	): void {
+		$exception = new $exception_class($error_message);
 
 		$this->router
-			->shouldReceive('matchRequest')
-			->with($this->request)
-			->once()
-			->andReturn(null);
-
-		$this->assertNull(
-			$this->application->handle()
-		);
-	}
-
-	public function testHandleBadRequestResponse() {
-		$response = 'roedlbroem';
-
-		$exception = new Exception\RequestException($response);
-
-		$this->setExpectedResponse(400, $response);
-
-		$this->router
-			->shouldReceive('matchRequest')
-			->with($this->request)
+			->shouldReceive('route')
+			->with($this->request, $this->base_path)
 			->once()
 			->andThrow($exception);
 
+		$this->setExpectedResponse($status_code, $error_message);
+
 		$this->assertNull(
-			$this->application->handle()
+			$this->application->handle($this->base_path)
 		);
 	}
 
-	public function testHandleSendInternalServerErrorResponse() {
-		$this->setExpectedResponse(500, 'The provided route callback is not callable');
+	public function handleDataProvider() {
+		$error_message = 'a-fancy-error-message';
 
-		$not_callable = 'really-not-callable';
-
-		$this->router
-			->shouldReceive('matchRequest')
-			->with($this->request)
-			->once()
-			->andReturn($not_callable);
-
-		$route_parameter = Map{};
-
-		$this->router
-			->shouldReceive('getRouteParameters')
-			->once()
-			->andReturn($route_parameter);
-
-		$this->request
-			->shouldReceive('setRouteParameters')
-			->with($route_parameter)
-			->once();
-
-		$this->assertNull(
-			$this->application->handle()
-		);
+		return [
+			[404, Exception\NotFoundException::class, $error_message],
+			[400, Exception\RequestException::class, $error_message],
+			[500, Exception\ServerException::class, $error_message],
+			[500, \Exception::class, 'Internal server error'],
+		];
 	}
 
 	public function testHandleSendOkResponse() {
-		$this->setExpectedResponse(200, 'OK');
+		$message = 'a-fancy-message';
 
-		$callable = function (RequestInterface $request) {
-			return 'OK';
-		};
+		$this->setExpectedResponse(200, $message);
 
 		$this->router
-			->shouldReceive('matchRequest')
-			->with($this->request)
+			->shouldReceive('route')
+			->with($this->request, $this->base_path)
 			->once()
-			->andReturn($callable);
-
-		$route_parameter = Map{};
-
-		$this->router
-			->shouldReceive('getRouteParameters')
-			->once()
-			->andReturn($route_parameter);
-
-		$this->request
-			->shouldReceive('setRouteParameters')
-			->with($route_parameter)
-			->once();
+			->andReturn($message);
 
 		$this->assertNull(
-			$this->application->handle()
+			$this->application->handle($this->base_path)
 		);
 	}
 
