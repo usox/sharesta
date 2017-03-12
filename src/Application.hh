@@ -36,7 +36,7 @@ final class Application implements ApplicationInterface {
 		$this->request->setRouteParameters($this->router->getRouteParameters());
 
 		if (!is_callable($callable)) {
-			throw new Exception\ServerException('This route callback was not callable.');
+			throw new Exception\ServerException('The provided route callback is not callable');
 		}
 		$this->sendResponse(200, $callable($this->request));
 	}
