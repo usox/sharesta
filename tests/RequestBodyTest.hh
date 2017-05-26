@@ -82,6 +82,13 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 		$this->getRequestBody('absolutly-no-json');
 	}
 
+	public function testWithEmptyBodyReturnsEmptyMap() {
+		$this->assertEquals(
+			Map{},
+			$this->getRequestBody('')
+		);
+	}
+
 	public function testWithJsonDataReturnsMap() {
 		$request_data = ['data' => 'really'];
 		$data = $this->getRequestBody(json_encode($request_data));
