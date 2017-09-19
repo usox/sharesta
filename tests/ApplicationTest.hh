@@ -1,16 +1,24 @@
-<?hh // partial
+<?hh // decl
 namespace Usox\Sharesta;
 
 use Mockery as m;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase {
 
+	private RequestInterface $request;
+
+	private ApiFactoryInterface $api_factory;
+
+	private RouterInterface $router;
+
+	private string $base_path = 'a-nice-path';
+
+	private Application $application;
+
 	public function setUp() {
 		$this->api_factory = m::mock(ApiFactoryInterface::class);
 		$this->request = m::mock(RequestInterface::class);
 		$this->router = m::mock(RouterInterface::class);
-
-		$this->base_path = 'a-nice-path';
 
 		$this->application = new Application(
 			$this->api_factory,

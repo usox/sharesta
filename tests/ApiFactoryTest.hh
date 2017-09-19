@@ -5,6 +5,8 @@ use Mockery as m;
 
 class ApiFactoryTest extends \PHPUnit_Framework_TestCase {
 
+	private ?ApiFactory $api_factory;
+
 	public function setUp(): void {
 		$this->api_factory = new ApiFactory();
 	}
@@ -14,7 +16,7 @@ class ApiFactoryTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testCreationMethodsReturnInstances(
 		string $method_name,
-		string $expected_class_name,
+		classname<I> $expected_class_name,
 		array<mixed> $parameter
 	) {
 		$this->assertInstanceOf(

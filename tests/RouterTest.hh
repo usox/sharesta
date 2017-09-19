@@ -1,4 +1,4 @@
-<?hh
+<?hh // decl
 namespace Usox\Sharesta;
 
 class RouterTest extends \PHPUnit_Framework_TestCase {   
