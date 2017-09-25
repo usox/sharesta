@@ -54,10 +54,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 		$error_message = 'a-fancy-error-message';
 
 		return [
-			[404, Exception\NotFoundException::class, $error_message],
-			[400, Exception\RequestException::class, $error_message],
-			[500, Exception\ServerException::class, $error_message],
-			[500, \Exception::class, 'Internal server error'],
+			[Application::HTTP_NOT_FOUND , Exception\NotFoundException::class, $error_message],
+			[Application::HTTP_BAD_REQUEST, Exception\RequestException::class, $error_message],
+			[Application::HTTP_INTERNAL_SERVER_ERROR, Exception\ServerException::class, $error_message],
+			[Application::HTTP_INTERNAL_SERVER_ERROR, \Exception::class, 'Internal server error'],
 		];
 	}
 

@@ -3,6 +3,11 @@ namespace Usox\Sharesta;
 
 final class Application implements ApplicationInterface {
 
+	const HTTP_OK = 200;
+	const HTTP_BAD_REQUEST = 400;
+	const HTTP_NOT_FOUND = 404;
+	const HTTP_INTERNAL_SERVER_ERROR = 500;
+
 	public function __construct(
 		private ApiFactoryInterface $api_factory,
 		private RequestInterface $request,
@@ -13,17 +18,29 @@ final class Application implements ApplicationInterface {
 	public function handle(string $base_path): void {
 		try {
 			$this->sendResponse(
-				200,
+				static::HTTP_OK,
 				$this->router->route($this->request, $base_path)
 			);
 		} catch (Exception\NotFoundException $e) {
-			$this->sendResponse(404, $e->getMessage());
+			$this->sendResponse(
+				static::HTTP_NOT_FOUND,
+				$e->getMessage()
+			);
 		} catch (Exception\RequestException $e) {
-			$this->sendResponse(400, $e->getMessage());
+			$this->sendResponse(
+				static::HTTP_BAD_REQUEST,
+				$e->getMessage()
+			);
 		} catch (Exception\ServerException $e) {
-			$this->sendResponse(500, $e->getMessage());
+			$this->sendResponse(
+				static::HTTP_INTERNAL_SERVER_ERROR,
+				$e->getMessage()
+			);
 		} catch (\Exception $e) {
-			$this->sendResponse(500, 'Internal server error');
+			$this->sendResponse(
+				static::HTTP_INTERNAL_SERVER_ERROR,
+				'Internal server error'
+			);
 		}
 	}
 
