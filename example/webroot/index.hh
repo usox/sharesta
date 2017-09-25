@@ -1,7 +1,7 @@
 <?hh // partial
 namespace Usox\Sharesta\Example;
 
-require_once 'vendor/autoload.php';
+require_once '../../vendor/autoload.php';
 
 use Usox\Sharesta\ApiFactory;
 use Usox\Sharesta\RequestInterface;
@@ -48,20 +48,15 @@ class Routes implements RoutesInterface {
 function init() {
 	$factory = new ApiFactory();
 
-	$router = $factory->createRouter();
-	$request = $factory->createRequest(
-		$router,
-		new Map($_SERVER),
-		new Map($_GET),
+	$router = $factory->createRouter(
+		new ImmMap($_SERVER),
+		new ImmMap($_GET)
 	);
 
 	$routes = new Routes();
 	$routes->registerRoutes($router);
 
-	$factory->createApplication(
-		$request,
-		$router
-	)
-	->handle('/PATH/TO/BASEDIR/THISFILE.hh');
+	$factory->createApplication($router)
+		->handle('/example/webroot/index.hh');
 }
 init();

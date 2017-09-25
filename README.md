@@ -56,23 +56,18 @@ Now bootstrap sharesta, register your routes and let the application controller 
 
 ```php
 	$factory = new Usox\Sharesta\ApiFactory();
-	$router = $factory->createRouter();
+	$router = $factory->createRouter(
+		new Map($_SERVER),
+		new Map($_GET)
+	);
 
 	$routes = new Routes();
 	$routes->registerRoutes($router);
 
-	$request = $factory->createRequest(
-		$router,
-		new Map($_SERVER),
-		new Map($_GET),
-	);
-	$factory->createApplication(
-		$request,
-		$router
-	)
-	->handle(
-		'index.hh' // path to the file. Leave it empty if your server configuration defaults to index.hh
-	);
+	$factory->createApplication($router)
+		->handle(
+			'index.hh' // path to the file. Leave it empty if your server configuration defaults to index.hh
+		);
 ```
 
 ## Example

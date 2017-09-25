@@ -27,9 +27,8 @@ class ApiFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function factoryMethodsDataProvider(): array<mixed> {
 		return [
-			['createRouter', Router::class, []],
-			['createRequest', Request::class, [m::mock(RouterInterface::class), Map{}, Map{}]],
-			['createApplication', Application::class, [m::mock(RequestInterface::class), m::mock(RouterInterface::class)]],
+			['createRouter', Router::class, [ImmMap{}, ImmMap{}]],
+			['createApplication', Application::class, [m::mock(RouterInterface::class)]],
 			['createResponse', Response::class, [666, 'roedlbroem']],
 		];
 	}

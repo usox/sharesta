@@ -7,9 +7,11 @@ interface RequestInterface {
 
 	public function getHttpMethod(): string;
 
-	public function getRouteParameters(): Map<string,string>;
+	public function getRouteParameters(): ImmMap<string,string>;
 
-	public function getUriValues(): Map<string,string>;
+	public function setRouteParameters(ImmMap<string, string> $route_parameters): void;
+
+	public function getUriValues(): ImmMap<string,string>;
 
 	public function getBodyAsJson(): string;
 

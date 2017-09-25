@@ -10,7 +10,6 @@ final class Application implements ApplicationInterface {
 
 	public function __construct(
 		private ApiFactoryInterface $api_factory,
-		private RequestInterface $request,
 		private RouterInterface $router
 	): void {
 	}
@@ -19,7 +18,7 @@ final class Application implements ApplicationInterface {
 		try {
 			$this->sendResponse(
 				static::HTTP_OK,
-				$this->router->route($this->request, $base_path)
+				$this->router->route($base_path)
 			);
 		} catch (Exception\NotFoundException $e) {
 			$this->sendResponse(

@@ -3,16 +3,12 @@ namespace Usox\Sharesta;
 
 interface ApiFactoryInterface {
 
-	public function createRouter(): RouterInterface;
-
-	public function createRequest(
-		RouterInterface $router,
-		Map<string,string> $get_vars,
-		Map<string,string> $server_vars
-	): RequestInterface;
+	public function createRouter(
+		ImmMap<string,string> $get_vars,
+		ImmMap<string,string> $server_vars
+	): RouterInterface;
 
 	public function createApplication(
-		RequestInterface $request,
 		RouterInterface $router
 	): ApplicationInterface;
 

@@ -17,12 +17,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 		$this->api_factory = m::mock(ApiFactoryInterface::class);
-		$this->request = m::mock(RequestInterface::class);
 		$this->router = m::mock(RouterInterface::class);
 
 		$this->application = new Application(
 			$this->api_factory,
-			$this->request,
 			$this->router
 		);
 	}
@@ -39,7 +37,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 
 		$this->router
 			->shouldReceive('route')
-			->with($this->request, $this->base_path)
+			->with($this->base_path)
 			->once()
 			->andThrow($exception);
 
@@ -68,7 +66,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 
 		$this->router
 			->shouldReceive('route')
-			->with($this->request, $this->base_path)
+			->with($this->base_path)
 			->once()
 			->andReturn($message);
 

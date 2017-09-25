@@ -9,9 +9,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 		$_GET = array('a' => '1', 'b' => '2');
 
 		$request = new Request(
-			new Router(),
-			new Map($_SERVER),
-			new Map($_GET),
+			new ImmMap($_SERVER),
+			new ImmMap($_GET),
 			new RequestBody()
 		);
 		$uri_values = $request->getUriValues();
