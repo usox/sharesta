@@ -15,5 +15,5 @@ interface RouterInterface {
 
 	public function getRouteParameters(): Map<string,string>;
 
-	public function route(RequestInterface $request, string $base_path): mixed;
+	public function route(RequestInterface $request, string $base_path): \JsonSerializable;
 }

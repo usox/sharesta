@@ -77,7 +77,7 @@ final class Router implements RouterInterface {
 		throw new Exception\ServerException('The requested resource was not found');
 	}
 
-	public function route(RequestInterface $request, string $base_path): mixed {
+	public function route(RequestInterface $request, string $base_path): \JsonSerializable {
 		$callable = $this->matchRequest($request, $base_path);
 		if ($callable === null) {
 			throw new Exception\NotFoundException('The requested resource was not found');
