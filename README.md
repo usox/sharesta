@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/usox/sharesta.svg?branch=master)](https://travis-ci.org/usox/sharesta)
-
 # Sharesta - Strict HAck RESTful Apis
 
 A micro framework to build simple and easy to use rest-like apis - written in
@@ -7,7 +5,7 @@ strict hack ([Hack](http://hacklang.org)).
 
 ## Usage
 
-Create a class containing your route configuration, also define a sample controller.
+Create a class containing your route configurations and register them.
 
 ```php
 final class Routes implements Usox\Sharesta\RoutesInterface {
@@ -15,13 +13,42 @@ final class Routes implements Usox\Sharesta\RoutesInterface {
 		$router->get('/', function (Usox\Sharesta\RequestInterface $request): \JsonSerializable {
 			return new HomeRoute();
 		});
+
+		/**
+		 * Get variables from the path (e.g. `http://some.tld/users/123`)
+		 */
+		$router->post('/users/:id', function (Usox\Sharesta\RequestInterface $request): \JsonSerializable {
+			return new UpdateUserRoute(
+				$request->getUriValues('id'),
+				$request->getRequestBody()
+			);
+		});
 	}
 }
+```
+Now define the classes which process the request.
+
+```php
 
 final class HomeRoute implements \JsonSerializable {
 	public function jsonSerialize(): string {
 		return 'Welcome home';
 	}
+}
+
+final class UpdateUserRoute implements \JsonSerializable {
+
+	public function __construct(
+		private int $user_id,
+		private \Usox\Sharesta\RequestInterface $request
+	): void {
+	}
+
+	public function jsonSerialize(): bool {
+		// do some magic, e.g. access the request body by $this->request
+		return true;
+	}
+
 }
 ```
 
@@ -44,7 +71,7 @@ Now bootstrap sharesta, register your routes and let the application controller 
 		$router
 	)
 	->handle(
-		'index.hh' // path to the file
+		'index.hh' // path to the file. Leave it empty if your server configuration defaults to index.hh
 	);
 ```
 

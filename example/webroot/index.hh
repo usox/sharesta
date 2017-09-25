@@ -1,7 +1,7 @@
 <?hh // partial
 namespace Usox\Sharesta\Example;
 
-require_once '../../vendor/autoload.php';
+require_once 'vendor/autoload.php';
 
 use Usox\Sharesta\ApiFactory;
 use Usox\Sharesta\RequestInterface;
@@ -62,6 +62,6 @@ function init() {
 		$request,
 		$router
 	)
-	->handle('/PATH/TO/BASEDIR');
+	->handle('/PATH/TO/BASEDIR/THISFILE.hh');
 }
 init();
