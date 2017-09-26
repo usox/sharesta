@@ -3,12 +3,21 @@ namespace Usox\Sharesta;
 
 final class Router implements RouterInterface {
 
+	const HTTP_OK = 200;
+	const HTTP_BAD_REQUEST = 400;
+	const HTTP_NOT_FOUND = 404;
+	const HTTP_INTERNAL_SERVER_ERROR = 500;
+
+	public function __construct(
+		private ApiFactoryInterface $api_factory,
+		private RequestInterface $request
+	): void {
+	}
+
 	private Map<string, (function (RequestInterface): \JsonSerializable)> $routes = Map {};
 
-	private Map<string, string> $route_parameters = Map {};
-
-	public function register(string $route, (function (RequestInterface): \JsonSerializable) $callback, string $http_method = ''): void {
-		if ($http_method) {
+	public function register(string $route, (function (RequestInterface): \JsonSerializable) $callback, ?string $http_method = null): void {
+		if ($http_method !== null) {
 			$route = sprintf(
 				'%s:%s',
 				$http_method,
@@ -35,15 +44,34 @@ final class Router implements RouterInterface {
 		$this->register($route, $callback, 'DELETE');
 	}
 
-	public function getRouteParameters(): Map<string,string> {
-		return $this->route_parameters;
+	public function route(string $base_path): void {
+		try {
+			$response = $this->matchRoute($base_path);
+			$status_code = static::HTTP_OK;
+		} catch (Exception\SharestaException $e) {
+			$response = $e->getMessage();
+			$status_code = $e->getHttpStatusCode();
+		} catch (\Exception $e) {
+			$response = 'Internal server error';
+			$status_code = static::HTTP_INTERNAL_SERVER_ERROR;
+		}
+
+		$this->api_factory->createResponse($status_code, $response)->send();
 	}
 
-	private function matchRequest(RequestInterface $request, string $base_path): (function (RequestInterface): \JsonSerializable) {
-		$requested_route = $request->getRoute($base_path);
-		$http_method = $request->getHttpMethod();
+	private function matchRoute(string $base_path): \JsonSerializable {
+		$requested_route = $this->request->getRoute($base_path);
+		$http_method = $this->request->getHttpMethod();
+		$route_parameters = Map{};
 
 		foreach ($this->routes as $route => $callback) {
+			// if the route also defines a HTTP method, use it as prefix for the lookup
+			$route_method = strstr($route, ':', true);
+			$request_prepend = '';
+
+			if ($route_method && substr($route_method, -1) != '/') {
+				$request_prepend = sprintf('%s:', $http_method);
+			}
 
 			$route_pattern = preg_replace(
 				'%/:([^ /?]+)(\?)?%',
@@ -51,41 +79,30 @@ final class Router implements RouterInterface {
 				$route
 			);
 
-			// if the route also defined a HTTP method to match against, 
-			// append the requested route with the request method
-			$route_method = strstr($route, ':', true);
-			if ($route_method && substr($route_method, -1) != '/') {
-				$requestPrepend = $http_method.':';
-			} else {
-				$requestPrepend = '';
-			}
-
 			$uri_params = [];
 			if (preg_match(
 				'%^'.$route_pattern.'$%',
-				$requestPrepend.$requested_route,
+				$request_prepend.$requested_route,
 				$uri_params)
 			) {
+				if ($callback === null) {
+					throw new Exception\NotFoundException('The requested resource was not found');
+				}
+
+				if (!is_callable($callback)) {
+					throw new Exception\ServerException('The provided route callback is not callable');
+				}
+
 				foreach ($uri_params as $key => $value) {
 					if (!is_numeric($key)) {
-						$this->route_parameters->add(Pair {$key, $value});
+						$route_parameters->add(Pair {$key, $value});
 					}
 				}
-				return $callback;
+				$this->request->setRouteParameters($route_parameters->toImmMap());
+
+				return $callback($this->request);
 			}
 		}
-		throw new Exception\ServerException('The requested resource was not found');
-	}
-
-	public function route(RequestInterface $request, string $base_path): mixed {
-		$callable = $this->matchRequest($request, $base_path);
-		if ($callable === null) {
-			throw new Exception\NotFoundException('The requested resource was not found');
-		}
-
-		if (!is_callable($callable)) {
-			throw new Exception\ServerException('The provided route callback is not callable');
-		}
-		return $callable($request);
+		throw new Exception\NotFoundException('The requested resource was not found');
 	}
 }

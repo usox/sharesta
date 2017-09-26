@@ -3,10 +3,11 @@ namespace Usox\Sharesta;
 
 final class Request implements RequestInterface {
 
+	public ImmMap<string, string> $route_parameters = ImmMap{};
+
 	public function __construct(
-		private RouterInterface $router,
-		private Map<string,string> $server_variables,
-		private Map<string,string> $get_variables,
+		private ImmMap<string,string> $server_variables,
+		private ImmMap<string,string> $get_variables,
 		private RequestBody $request_body
 	) {
 	}
@@ -21,7 +22,7 @@ final class Request implements RequestInterface {
 		if ($route == '') {
 			$route = '/';
 		}
-		return str_replace('//','/', $route);
+		return str_replace('//', '/', $route);
 	}
 
 	<<__Memoize>>
@@ -33,21 +34,19 @@ final class Request implements RequestInterface {
 		return '';
 	}
 
-	public function getRouteParameters(): Map<string,string> {
-		return $this->router->getRouteParameters();
+	public function setRouteParameters(ImmMap<string, string> $route_parameters): void {
+		$this->route_parameters = $route_parameters;
+	}
+
+	public function getRouteParameters(): ImmMap<string,string> {
+		return $this->route_parameters;
+	}
+
+	public function getUriValues(): ImmMap<string,string> {
+		return $this->get_variables;
 	}
 
 	<<__Memoize>>
-	public function getUriValues(): Map<string,string> {
-		$uri_values = Map{};
-
-		foreach ($this->get_variables as $key => $value) {
-			$uri_values->add(Pair {$key, $value});
-		}
-
-		return $uri_values;
-	}
-
 	public function getBodyAsJson(): string {
 		return json_encode($this->request_body->getBody());
 	}

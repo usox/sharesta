@@ -4,27 +4,10 @@ namespace Usox\Sharesta;
 final class Response implements ResponseInterface {
 
 	private Map<int, string> $codes = Map {
-		200 => 'OK',
-		201 => 'Created',
-		202 => 'Accepted',
-		204 => 'No Content',
-		301 => 'Moved Permanently',
-		302 => 'Found',
-		304 => 'Not Modified',
-		307 => 'Temporary Redirect',
-		308 => 'Permanent Redirect',
-		400 => 'Bad Request',
-		401 => 'Unauthorized',
-		403 => 'Forbidden',
-		404 => 'Not Found',
-		405 => 'Method Not Allowed',
-		406 => 'Not Acceptable',
-		410 => 'Gone',
-		415 => 'Unsupported Media Type',
-		417 => 'Expectation Failed',
-		429 => 'Too Many Requests',
-		500 => 'Internal Server Error',
-		501 => 'Not Implemented'
+		Router::HTTP_OK => 'OK',
+		Router::HTTP_BAD_REQUEST => 'Bad Request',
+		Router::HTTP_NOT_FOUND => 'Not Found',
+		Router::HTTP_INTERNAL_SERVER_ERROR => 'Internal Server Error',
 	};
 
 	public function __construct(

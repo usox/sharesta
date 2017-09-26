@@ -1,5 +1,7 @@
-<?hh
+<?hh // decl
 namespace Usox\Sharesta;
+
+use Facebook\TypeAssert\IncorrectTypeException;
 
 class InputStreamWrapper {
 
@@ -79,19 +81,21 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 			Exception\RequestException::class
 		);
 
-		$this->getRequestBody('absolutly-no-json');
+		file_put_contents('php://input', 'absolutly-no-json');
+
+		$this->request_body->getBody();
 	}
 
 	public function testWithEmptyBodyReturnsEmptyMap() {
 		$this->assertEquals(
 			Map{},
-			$this->getRequestBody('')
+			$this->getRequestBody([])
 		);
 	}
 
 	public function testWithJsonDataReturnsMap() {
 		$request_data = ['data' => 'really'];
-		$data = $this->getRequestBody(json_encode($request_data));
+		$data = $this->getRequestBody($request_data);
 
 		$this->assertEquals(
 			new Map($request_data),
@@ -99,8 +103,108 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
+	public function testGetAsStringFailsWithNonString(): void {
+		$this->expectException(IncorrectTypeException::class);
+
+		$this->fillBody(['data' => 123]);
+
+		$this->request_body->getAsString('data');
+	}
+
+	public function testGetAsStringReturnsString(): void {
+		$expectation = 'some-string';
+
+		$this->fillBody(['data' => $expectation]);
+
+		$this->assertSame(
+			$expectation,
+			$this->request_body->getAsString('data')
+		);
+	}
+
+	public function testGetAsIntFailsWithNonInt(): void {
+		$this->expectException(IncorrectTypeException::class);
+
+		$this->fillBody(['data' => 'we-want-snoo-snoo']);
+
+		$this->request_body->getAsInt('data');
+	}
+
+	public function testGetAsIntReturnsInt(): void {
+		$expectation = 123;
+
+		$this->fillBody(['data' => $expectation]);
+
+		$this->assertSame(
+			$expectation,
+			$this->request_body->getAsInt('data')
+		);
+	}
+
+	public function testGetAsIntFailsWithNonBool(): void {
+		$this->expectException(IncorrectTypeException::class);
+
+		$this->fillBody(['data' => 'mister-noob-noob']);
+
+		$this->request_body->getAsBool('data');
+	}
+
+	public function testGetAsBoolReturnsBool(): void {
+		$expectation = true;
+
+		$this->fillBody(['data' => $expectation]);
+
+		$this->assertSame(
+			$expectation,
+			$this->request_body->getAsBool('data')
+		);
+	}
+
+	public function testGetAsVectorThrowsExceptionOnNonArray(): void {
+		$this->expectException(IncorrectTypeException::class);
+
+		$this->fillBody(['data' => 'BOOM']);
+
+		$this->request_body->getAsVector('data');
+	}
+
+	public function testGetAsVectorReturnsVector(): void {
+		$data = ['I-will-be-ignored' => 'Me-not'];
+
+		$this->fillBody(['data' => $data]);
+
+		$this->assertEquals(
+			new Vector($data),
+			$this->request_body->getAsVector('data')
+		);
+	}
+
+	public function testGetAsMapThrowsExceptionOnNonArray(): void {
+		$this->expectException(IncorrectTypeException::class);
+
+		$this->fillBody(['data' => 'BOOM']);
+
+		$this->request_body->getAsMap('data');
+	}
+
+	public function testGetAsMapReturnsMap(): void {
+		$data = ['da-key' => 'da-value'];
+
+		$this->fillBody(['data' => $data]);
+
+		$this->assertEquals(
+			new Map($data),
+			$this->request_body->getAsMap('data')
+		);
+	}
+
+	private function fillBody(array<string, mixed> $body): void {
+		file_put_contents('php://input', json_encode($body));
+	}
+
 	private function getRequestBody($input) {
-		file_put_contents('php://input', $input);
+		$this->fillBody($input);
+
 		return $this->request_body->getBody();	
 	}
 

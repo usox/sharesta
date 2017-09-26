@@ -1,79 +1,168 @@
-<?hh
+<?hh // decl
 namespace Usox\Sharesta;
 
-class RouterTest extends \PHPUnit_Framework_TestCase {   
+class RouterTest extends \PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 		$this->result = \Mockery::mock(\JsonSerializable::class);
 		$this->callable = function(RequestInterface $request): \JsonSerializable { return $this->result; };
 		$this->base_path = 'some-nice-path';
+		$this->request = \Mockery::mock(RequestInterface::class);
+		$this->api_factory = \Mockery::mock(ApiFactoryInterface::class);
+		$this->response = \Mockery::mock(ResponseInterface::class);
+
+		$this->router = new Router(
+			$this->api_factory,
+			$this->request
+		);
 	}
 
 	public function testRouterMatchesRequestCorrectly() {
-		$router = new Router();
+		$this->router->register('users/:id/:field', $this->callable);
 
-		$router->register('users/:id/:field', $this->callable);
+		$this->createRequest('users/12/name', 'GET');
 
-		$this->assertSame(
-			$this->result,
-			$router->route($this->createRequest('users/12/name', 'GET'), $this->base_path)
+		$this->request
+			->shouldReceive('setRouteParameters')
+			->with(\Mockery::on(function ($value) {
+				return $value->toArray() == ['id' => 12, 'field' => 'name'];
+			}))
+			->once();
+
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_OK, $this->result)
+			->once()
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->once();
+
+		$this->assertNull(
+			$this->router->route($this->base_path)
 		);
+	}
+
+	public function testRouterCatchesDefaultExceptionCorrectly() {
+		$this->request
+			->shouldReceive('getRoute')
+			->once()
+			->andThrow(new \Exception());
+
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error')
+			->once()
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->once();
+
+		$this->router->route($this->base_path);
 	}
 
 	public function testRouterFailsToMatchRequestCorrectly() {
-		$this->setExpectedException(
-			Exception\ServerException::class,
-			'The requested resource was not found'
-		);
-		$router = new Router();
+		$this->router->register('foo/:id/:field', $this->callable);
 
-		$router->register('foo/:id/:field', $this->callable);
-		$router->route($this->createRequest('/api/users/12/name', 'GET'), $this->base_path);
+		$this->createRequest('/api/users/12/name', 'GET');
+
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_NOT_FOUND, 'The requested resource was not found')
+			->once()
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->once();
+
+		$this->router->route($this->base_path);
 	}
 
 	public function testRouterMatchesSpecificHTTPMethodCorrectly() {
-		$router = new Router();
+		$this->router->register('gettest/:id/:field', $this->callable, 'GET');
+		$this->router->register('posttest/:id/:field', $this->callable, 'POST');
+		$this->router->register('puttest/:id/:field', $this->callable, 'PUT');
+		$this->router->register('deltest/:id/:field', $this->callable, 'DELETE');
 
-		$router->register('gettest/:id/:field', $this->callable, 'GET');
-		$router->register('posttest/:id/:field', $this->callable, 'POST');
-		$router->register('puttest/:id/:field', $this->callable, 'PUT');
-		$router->register('deltest/:id/:field', $this->callable, 'DELETE');
+		$this->request
+			->shouldReceive('setRouteParameters')
+			->with(\Mockery::on(function ($value) {
+				return $value->toArray() == ['id' => 12, 'field' => 'name'];
+			}))
+			->times(4);
 
-		$this->assertSame($this->result, $router->route($this->createRequest('gettest/12/name', 'GET'), $this->base_path));
-		$this->assertSame($this->result, $router->route($this->createRequest('posttest/12/name', 'POST'), $this->base_path));
-		$this->assertSame($this->result, $router->route($this->createRequest('puttest/12/name', 'PUT'), $this->base_path));
-		$this->assertSame($this->result, $router->route($this->createRequest('deltest/12/name', 'DELETE'), $this->base_path));
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_OK, $this->result)
+			->times(4)
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->times(4);
+
+		$this->createRequest('gettest/12/name', 'GET');
+
+		$this->assertNull($this->router->route($this->base_path));
+
+		$this->createRequest('posttest/12/name', 'POST');
+
+		$this->assertNull($this->router->route($this->base_path));
+
+		$this->createRequest('puttest/12/name', 'PUT');
+
+		$this->assertNull($this->router->route($this->base_path));
+
+		$this->createRequest('deltest/12/name', 'DELETE');
+
+		$this->assertNull($this->router->route($this->base_path));
 	}
 
 	public function testRouterMatchesSpecificHTTPMethodCorrectlyUsingShortcuts() {
-		$router = new Router();
+		$this->router->get('gettest/:id/:field', $this->callable);
+		$this->router->post('posttest/:id/:field', $this->callable);
+		$this->router->put('puttest/:id/:field', $this->callable);
+		$this->router->delete('deltest/:id/:field', $this->callable);
 
-		$router->get('gettest/:id/:field', $this->callable);
-		$router->post('posttest/:id/:field', $this->callable);
-		$router->put('puttest/:id/:field', $this->callable);
-		$router->delete('deltest/:id/:field', $this->callable);
+		$this->request
+			->shouldReceive('setRouteParameters')
+			->with(\Mockery::on(function ($value) {
+				return $value->toArray() == ['id' => 12, 'field' => 'name'];
+			}))
+			->times(4);
 
-		$this->assertSame($this->result, $router->route($this->createRequest('gettest/12/name', 'GET'), $this->base_path));
-		$this->assertSame($this->result, $router->route($this->createRequest('posttest/12/name', 'POST'), $this->base_path));
-		$this->assertSame($this->result, $router->route($this->createRequest('puttest/12/name', 'PUT'), $this->base_path));
-		$this->assertSame($this->result, $router->route($this->createRequest('deltest/12/name', 'DELETE'), $this->base_path));
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_OK, $this->result)
+			->times(4)
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->times(4);
+
+		$this->createRequest('gettest/12/name', 'GET');
+
+		$this->assertNull($this->router->route($this->base_path));
+
+		$this->createRequest('posttest/12/name', 'POST');
+
+		$this->assertNull($this->router->route($this->base_path));
+
+		$this->createRequest('puttest/12/name', 'PUT');
+
+		$this->assertNull($this->router->route($this->base_path));
+
+		$this->createRequest('deltest/12/name', 'DELETE');
+
+		$this->assertNull($this->router->route($this->base_path));
 	}
 
-	public function testRouterObtainsRouteParamsCorrectly() {
-		$router = new Router();
-
-		$router->register('users/:id/:field', $this->callable);
-		$router->route($this->createRequest('users/12/name', 'GET'), $this->base_path);
-		$routeParams = $router->getRouteParameters();
-
-		$this->assertEquals($routeParams->get('id'), '12');
-		$this->assertEquals($routeParams->get('field'), 'name');
-	}
-
-	private function createRequest(string $route, string $http_method) {
-		$request = \Mockery::mock(RequestInterface::class);
-		$request->shouldReceive('getRoute')->once()->andReturn($route);
-		$request->shouldReceive('getHttpMethod')->once()->andReturn($http_method);
-		return $request;
+	private function createRequest(string $route, string $http_method): void {
+		$this->request->shouldReceive('getRoute')->once()->andReturn($route);
+		$this->request->shouldReceive('getHttpMethod')->once()->andReturn($http_method);
 	}
 }
