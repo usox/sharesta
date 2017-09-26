@@ -3,7 +3,15 @@ namespace Usox\Sharesta;
 
 final class Router implements RouterInterface {
 
-	public function __construct(private RequestInterface $request): void {
+	const HTTP_OK = 200;
+	const HTTP_BAD_REQUEST = 400;
+	const HTTP_NOT_FOUND = 404;
+	const HTTP_INTERNAL_SERVER_ERROR = 500;
+
+	public function __construct(
+		private ApiFactoryInterface $api_factory,
+		private RequestInterface $request
+	): void {
 	}
 
 	private Map<string, (function (RequestInterface): \JsonSerializable)> $routes = Map {};
@@ -36,7 +44,22 @@ final class Router implements RouterInterface {
 		$this->register($route, $callback, 'DELETE');
 	}
 
-	public function route(string $base_path): \JsonSerializable {
+	public function route(string $base_path): void {
+		try {
+			$response = $this->matchRoute($base_path);
+			$status_code = static::HTTP_OK;
+		} catch (Exception\SharestaException $e) {
+			$response = $e->getMessage();
+			$status_code = $e->getHttpStatusCode();
+		} catch (\Exception $e) {
+			$response = 'Internal server error';
+			$status_code = static::HTTP_INTERNAL_SERVER_ERROR;
+		}
+
+		$this->api_factory->createResponse($status_code, $response)->send();
+	}
+
+	private function matchRoute(string $base_path): \JsonSerializable {
 		$requested_route = $this->request->getRoute($base_path);
 		$http_method = $this->request->getHttpMethod();
 		$route_parameters = Map{};

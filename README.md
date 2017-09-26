@@ -64,10 +64,9 @@ Now bootstrap sharesta, register your routes and let the application controller 
 	$routes = new Routes();
 	$routes->registerRoutes($router);
 
-	$factory->createApplication($router)
-		->handle(
-			'index.hh' // path to the file. Leave it empty if your server configuration defaults to index.hh
-		);
+	$router->route(
+		'index.hh' // path to the file. Leave it empty if your server configuration defaults to index.hh
+	);
 ```
 
 ## Example

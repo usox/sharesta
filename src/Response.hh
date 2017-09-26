@@ -4,10 +4,10 @@ namespace Usox\Sharesta;
 final class Response implements ResponseInterface {
 
 	private Map<int, string> $codes = Map {
-		Application::HTTP_OK => 'OK',
-		Application::HTTP_BAD_REQUEST => 'Bad Request',
-		Application::HTTP_NOT_FOUND => 'Not Found',
-		Application::HTTP_INTERNAL_SERVER_ERROR => 'Internal Server Error',
+		Router::HTTP_OK => 'OK',
+		Router::HTTP_BAD_REQUEST => 'Bad Request',
+		Router::HTTP_NOT_FOUND => 'Not Found',
+		Router::HTTP_INTERNAL_SERVER_ERROR => 'Internal Server Error',
 	};
 
 	public function __construct(

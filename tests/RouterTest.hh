@@ -1,22 +1,27 @@
 <?hh // decl
 namespace Usox\Sharesta;
 
-class RouterTest extends \PHPUnit_Framework_TestCase {   
+class RouterTest extends \PHPUnit_Framework_TestCase {
 
 	public function setUp() {
 		$this->result = \Mockery::mock(\JsonSerializable::class);
 		$this->callable = function(RequestInterface $request): \JsonSerializable { return $this->result; };
 		$this->base_path = 'some-nice-path';
 		$this->request = \Mockery::mock(RequestInterface::class);
+		$this->api_factory = \Mockery::mock(ApiFactoryInterface::class);
+		$this->response = \Mockery::mock(ResponseInterface::class);
 
-		$this->router = new Router($this->request);
+		$this->router = new Router(
+			$this->api_factory,
+			$this->request
+		);
 	}
 
 	public function testRouterMatchesRequestCorrectly() {
 		$this->router->register('users/:id/:field', $this->callable);
 
 		$this->createRequest('users/12/name', 'GET');
-		
+
 		$this->request
 			->shouldReceive('setRouteParameters')
 			->with(\Mockery::on(function ($value) {
@@ -24,20 +29,54 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			}))
 			->once();
 
-		$this->assertSame(
-			$this->result,
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_OK, $this->result)
+			->once()
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->once();
+
+		$this->assertNull(
 			$this->router->route($this->base_path)
 		);
 	}
 
+	public function testRouterCatchesDefaultExceptionCorrectly() {
+		$this->request
+			->shouldReceive('getRoute')
+			->once()
+			->andThrow(new \Exception());
+
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error')
+			->once()
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->once();
+
+		$this->router->route($this->base_path);
+	}
+
 	public function testRouterFailsToMatchRequestCorrectly() {
-		$this->setExpectedException(
-			Exception\NotFoundException::class,
-			'The requested resource was not found'
-		);
 		$this->router->register('foo/:id/:field', $this->callable);
 
 		$this->createRequest('/api/users/12/name', 'GET');
+
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_NOT_FOUND, 'The requested resource was not found')
+			->once()
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->once();
 
 		$this->router->route($this->base_path);
 	}
@@ -55,21 +94,31 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			}))
 			->times(4);
 
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_OK, $this->result)
+			->times(4)
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->times(4);
+
 		$this->createRequest('gettest/12/name', 'GET');
 
-		$this->assertSame($this->result, $this->router->route($this->base_path));
+		$this->assertNull($this->router->route($this->base_path));
 
 		$this->createRequest('posttest/12/name', 'POST');
 
-		$this->assertSame($this->result, $this->router->route($this->base_path));
+		$this->assertNull($this->router->route($this->base_path));
 
 		$this->createRequest('puttest/12/name', 'PUT');
 
-		$this->assertSame($this->result, $this->router->route($this->base_path));
+		$this->assertNull($this->router->route($this->base_path));
 
 		$this->createRequest('deltest/12/name', 'DELETE');
 
-		$this->assertSame($this->result, $this->router->route($this->base_path));
+		$this->assertNull($this->router->route($this->base_path));
 	}
 
 	public function testRouterMatchesSpecificHTTPMethodCorrectlyUsingShortcuts() {
@@ -85,21 +134,31 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			}))
 			->times(4);
 
+		$this->api_factory
+			->shouldReceive('createResponse')
+			->with(Router::HTTP_OK, $this->result)
+			->times(4)
+			->andReturn($this->response);
+
+		$this->response
+			->shouldReceive('send')
+			->times(4);
+
 		$this->createRequest('gettest/12/name', 'GET');
 
-		$this->assertSame($this->result, $this->router->route($this->base_path));
+		$this->assertNull($this->router->route($this->base_path));
 
 		$this->createRequest('posttest/12/name', 'POST');
 
-		$this->assertSame($this->result, $this->router->route($this->base_path));
+		$this->assertNull($this->router->route($this->base_path));
 
 		$this->createRequest('puttest/12/name', 'PUT');
 
-		$this->assertSame($this->result, $this->router->route($this->base_path));
+		$this->assertNull($this->router->route($this->base_path));
 
 		$this->createRequest('deltest/12/name', 'DELETE');
 
-		$this->assertSame($this->result, $this->router->route($this->base_path));
+		$this->assertNull($this->router->route($this->base_path));
 	}
 
 	private function createRequest(string $route, string $http_method): void {

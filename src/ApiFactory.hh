@@ -8,20 +8,12 @@ final class ApiFactory implements ApiFactoryInterface {
 		ImmMap<string,string> $server_vars
 	): RouterInterface {
 		return new Router(
+			$this,
 			new Request(
 				$get_vars,
 				$server_vars,
 				new RequestBody()
 			)
-		);
-	}
-
-	public function createApplication(
-		RouterInterface $router
-	): ApplicationInterface {
-		return new Application(
-			$this,
-			$router
 		);
 	}
 

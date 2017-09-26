@@ -56,7 +56,6 @@ function init() {
 	$routes = new Routes();
 	$routes->registerRoutes($router);
 
-	$factory->createApplication($router)
-		->handle('/example/webroot/index.hh');
+	$router->route('/example/webroot/index.hh');
 }
 init();
