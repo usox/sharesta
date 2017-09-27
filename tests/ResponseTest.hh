@@ -54,7 +54,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 			->once();
 
 		$this->expectOutputString(
-			sprintf('"%s"', $body)
+			$body
 		);
 		$response->send();
 	}
