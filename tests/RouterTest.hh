@@ -11,6 +11,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		$this->api_factory = \Mockery::mock(ApiFactoryInterface::class);
 		$this->response = \Mockery::mock(ResponseInterface::class);
 
+		$this->default_result = 'roedlbroem';
+
 		$this->router = new Router(
 			$this->api_factory,
 			$this->request
@@ -31,13 +33,18 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->api_factory
 			->shouldReceive('createResponse')
-			->with(Router::HTTP_OK, $this->result)
+			->with(Router::HTTP_OK, sprintf('"%s"', $this->default_result))
 			->once()
 			->andReturn($this->response);
 
 		$this->response
 			->shouldReceive('send')
 			->once();
+
+		$this->result
+			->shouldReceive('jsonSerialize')
+			->once()
+			->andReturn($this->default_result);
 
 		$this->assertNull(
 			$this->router->route($this->base_path)
@@ -96,13 +103,18 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->api_factory
 			->shouldReceive('createResponse')
-			->with(Router::HTTP_OK, $this->result)
+			->with(Router::HTTP_OK, sprintf('"%s"', $this->default_result))
 			->times(4)
 			->andReturn($this->response);
 
 		$this->response
 			->shouldReceive('send')
 			->times(4);
+
+		$this->result
+			->shouldReceive('jsonSerialize')
+			->times(4)
+			->andReturn($this->default_result);
 
 		$this->createRequest('gettest/12/name', 'GET');
 
@@ -136,13 +148,18 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->api_factory
 			->shouldReceive('createResponse')
-			->with(Router::HTTP_OK, $this->result)
+			->with(Router::HTTP_OK, sprintf('"%s"', $this->default_result))
 			->times(4)
 			->andReturn($this->response);
 
 		$this->response
 			->shouldReceive('send')
 			->times(4);
+
+		$this->result
+			->shouldReceive('jsonSerialize')
+			->times(4)
+			->andReturn($this->default_result);
 
 		$this->createRequest('gettest/12/name', 'GET');
 

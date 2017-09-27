@@ -12,17 +12,19 @@ final class Response implements ResponseInterface {
 
 	public function __construct(
 		private int $code,
-		private mixed $body
+		private ?string $body
 	) {}
 
 	public function send(): void {
 		if ($this->codes->contains($this->code)) {
-			if (!$this->body) {
-				$this->body = $this->codes->get($this->code);
+			if (null === $this->body) {
+				$this->body = json_encode(
+					$this->codes->get($this->code)
+				);
 			}
 		} else {
 			$this->code = 500;
-			$this->body = 'API attempted to return an unknown HTTP status.';
+			$this->body = json_encode('API attempted to return an unknown HTTP status.');
 		}
 
 		header(
@@ -33,6 +35,6 @@ final class Response implements ResponseInterface {
 			)
 		);
 		header('Content-type: application/json');
-		echo json_encode($this->body);
+		echo $this->body;
 	}
 }
