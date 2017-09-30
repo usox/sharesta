@@ -46,7 +46,7 @@ final class Router implements RouterInterface {
 
 	public function route(string $base_path): void {
 		try {
-			$response = $this->matchRoute($base_path);
+			$response = json_encode($this->matchRoute($base_path));
 			$status_code = static::HTTP_OK;
 		} catch (Exception\SharestaException $e) {
 			$response = $e->getMessage();

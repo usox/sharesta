@@ -8,5 +8,5 @@ interface ApiFactoryInterface {
 		ImmMap<string,string> $server_vars
 	): RouterInterface;
 
-	public function createResponse(int $status_code, mixed $body): ResponseInterface;
+	public function createResponse(int $status_code, ?string $body): ResponseInterface;
 }
