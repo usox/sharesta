@@ -34,10 +34,10 @@ class GetSomeIdRoute implements \JsonSerializable {
 class Routes implements RoutesInterface {
 
 	public function registerRoutes(RouterInterface $router): void {
-		$router->get('/', function (RequestInterface $request) {
+		$router->get('/', (RequestInterface $request): \JsonSerializable ==> {
 			return new HomeRoute();
 		});
-		$router->get('/get_some/:id', function (RequestInterface $request) {
+		$router->get('/get_some/:id', (RequestInterface $request): \JsonSerializable ==> {
 			$route = new GetSomeIdRoute($request);
 			$route->doSomeFancyMagic();
 			return $route;

@@ -10,14 +10,14 @@ Create a class containing your route configurations and register them.
 ```php
 final class Routes implements Usox\Sharesta\RoutesInterface {
 	public function registerRoutes(Usox\Sharesta\RouterInterface $router): void {
-		$router->get('/', function (Usox\Sharesta\RequestInterface $request): \JsonSerializable {
+		$router->get('/', (Usox\Sharesta\RequestInterface $request): \JsonSerializable == > {
 			return new HomeRoute();
 		});
 
 		/**
 		 * Get variables from the path (e.g. `http://some.tld/users/123`)
 		 */
-		$router->post('/users/:id', function (Usox\Sharesta\RequestInterface $request): \JsonSerializable {
+		$router->post('/users/:id', (Usox\Sharesta\RequestInterface $request): \JsonSerializable ==> {
 			return new UpdateUserRoute(
 				$request->getUriValues('id'),
 				$request->getRequestBody()
