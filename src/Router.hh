@@ -80,11 +80,7 @@ final class Router implements RouterInterface {
 			);
 
 			$uri_params = [];
-			if (preg_match(
-				'%^'.$route_pattern.'$%',
-				$request_prepend.$requested_route,
-				$uri_params)
-			) {
+			if (preg_match('%^'.$route_pattern.'$%', $request_prepend.$requested_route, &$uri_params)) {
 				if ($callback === null) {
 					throw new Exception\NotFoundException('The requested resource was not found');
 				}
