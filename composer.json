@@ -11,12 +11,12 @@
 	}
     ],
     "require": {
-	"hhvm": ">=3.18",
+	"hhvm": ">=3.24",
 	"hhvm/type-assert": "^2"
     },
     "require-dev": {
 	    "phpunit/phpunit": "^5",
-	    "mockery/mockery": "^0"
+	    "mockery/mockery": "^1"
     },
     "autoload": {
         "psr-4": {

@@ -1,8 +1,6 @@
 <?hh // partial
 namespace Usox\Sharesta;
 
-use Mockery as m;
-
 class ApiFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	private ?ApiFactory $api_factory;
