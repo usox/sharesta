@@ -1,6 +1,8 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
+use HH\Lib\Str;
+
 final class Router implements RouterInterface {
 
 	const HTTP_OK = 200;
@@ -18,7 +20,7 @@ final class Router implements RouterInterface {
 
 	public function register(string $route, (function (RequestInterface): \JsonSerializable) $callback, ?string $http_method = null): void {
 		if ($http_method !== null) {
-			$route = \sprintf(
+			$route = Str\format(
 				'%s:%s',
 				$http_method,
 				$route
@@ -70,7 +72,7 @@ final class Router implements RouterInterface {
 			$request_prepend = '';
 
 			if ($route_method && \substr($route_method, -1) != '/') {
-				$request_prepend = \sprintf('%s:', $http_method);
+				$request_prepend = Str\format('%s:', $http_method);
 			}
 
 			$route_pattern = \preg_replace(

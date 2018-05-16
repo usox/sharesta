@@ -1,6 +1,8 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
+use HH\Lib\Str;
+
 final class Response implements ResponseInterface {
 
 	private Map<int, string> $codes = Map {
@@ -28,10 +30,10 @@ final class Response implements ResponseInterface {
 		}
 
 		\header(
-			\sprintf(
+			Str\format(
 				'HTTP/1.1 %d %s' ,
 				$this->code,
-				$this->codes->get($this->code)
+				(string) $this->codes->get($this->code)
 			)
 		);
 		\header('Content-type: application/json');

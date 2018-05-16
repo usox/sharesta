@@ -1,6 +1,8 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
+use HH\Lib\Str;
+
 final class Request implements RequestInterface {
 
 	public ImmMap<string, string> $route_parameters = ImmMap{};
@@ -14,15 +16,31 @@ final class Request implements RequestInterface {
 
 	<<__Memoize>>
 	public function getRoute(string $base_path): string {
-		$route = \str_replace($base_path, '', $this->server_variables->get('REQUEST_URI'));
+		$route = Str\replace(
+			(string) $this->server_variables->get('REQUEST_URI'),
+			$base_path,
+			''
+		);
+
 		if ($this->server_variables->contains('QUERY_STRING')) {
-			$route = \str_replace('?' . $this->server_variables->get('QUERY_STRING') , '', $route);
+			$route = Str\replace(
+				$route,
+				'?' . $this->server_variables->get('QUERY_STRING')
+				,
+				'',
+			);
 		}
+
 		$route = \rtrim($route, '/');
 		if ($route == '') {
 			$route = '/';
 		}
-		return \str_replace('//', '/', $route);
+
+		return Str\replace(
+			$route,
+			'//',
+			'/',
+		);
 	}
 
 	<<__Memoize>>
