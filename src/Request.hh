@@ -14,15 +14,15 @@ final class Request implements RequestInterface {
 
 	<<__Memoize>>
 	public function getRoute(string $base_path): string {
-		$route = str_replace($base_path, '', $this->server_variables->get('REQUEST_URI'));
+		$route = \str_replace($base_path, '', $this->server_variables->get('REQUEST_URI'));
 		if ($this->server_variables->contains('QUERY_STRING')) {
-			$route = str_replace('?' . $this->server_variables->get('QUERY_STRING') , '', $route);
+			$route = \str_replace('?' . $this->server_variables->get('QUERY_STRING') , '', $route);
 		}
-		$route = rtrim($route, '/');
+		$route = \rtrim($route, '/');
 		if ($route == '') {
 			$route = '/';
 		}
-		return str_replace('//', '/', $route);
+		return \str_replace('//', '/', $route);
 	}
 
 	<<__Memoize>>
@@ -48,7 +48,7 @@ final class Request implements RequestInterface {
 
 	<<__Memoize>>
 	public function getBodyAsJson(): string {
-		return json_encode($this->request_body->getBody());
+		return \json_encode($this->request_body->getBody());
 	}
 
 	public function getBody(): Map<string,mixed> {

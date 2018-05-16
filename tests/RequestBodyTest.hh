@@ -1,7 +1,7 @@
-<?hh // decl
+<?hh // partial
 namespace Usox\Sharesta;
 
-use Facebook\TypeAssert\IncorrectTypeException;
+use Facebook\TypeAssert\UnsupportedTypeException;
 
 class InputStreamWrapper {
 
@@ -70,6 +70,8 @@ class InputStreamWrapper {
  */
 class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
+	private ?RequestBody $request_body;
+
 	public function setUp() {
 		stream_wrapper_unregister('php');
 		stream_wrapper_register('php', InputStreamWrapper::class);
@@ -77,13 +79,13 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testWithoutJsonDataThrowsException() {
-		$this->setExpectedException(
+		$this->expectException(
 			Exception\RequestException::class
 		);
 
 		file_put_contents('php://input', 'absolutly-no-json');
 
-		$this->request_body->getBody();
+		$this->request_body?->getBody();
 	}
 
 	public function testWithEmptyBodyReturnsEmptyMap() {
@@ -104,11 +106,11 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetAsStringFailsWithNonString(): void {
-		$this->expectException(IncorrectTypeException::class);
+		$this->expectException(Exception\Request\InvalidRequestParamException::class);
 
 		$this->fillBody(['data' => 123]);
 
-		$this->request_body->getAsString('data');
+		$this->request_body?->getAsString('data');
 	}
 
 	public function testGetAsStringReturnsString(): void {
@@ -118,16 +120,16 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertSame(
 			$expectation,
-			$this->request_body->getAsString('data')
+			$this->request_body?->getAsString('data')
 		);
 	}
 
 	public function testGetAsIntFailsWithNonInt(): void {
-		$this->expectException(IncorrectTypeException::class);
+		$this->expectException(Exception\Request\InvalidRequestParamException::class);
 
 		$this->fillBody(['data' => 'we-want-snoo-snoo']);
 
-		$this->request_body->getAsInt('data');
+		$this->request_body?->getAsInt('data');
 	}
 
 	public function testGetAsIntReturnsInt(): void {
@@ -137,16 +139,16 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertSame(
 			$expectation,
-			$this->request_body->getAsInt('data')
+			$this->request_body?->getAsInt('data')
 		);
 	}
 
 	public function testGetAsIntFailsWithNonBool(): void {
-		$this->expectException(IncorrectTypeException::class);
+		$this->expectException(Exception\Request\InvalidRequestParamException::class);
 
 		$this->fillBody(['data' => 'mister-noob-noob']);
 
-		$this->request_body->getAsBool('data');
+		$this->request_body?->getAsBool('data');
 	}
 
 	public function testGetAsBoolReturnsBool(): void {
@@ -156,16 +158,16 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertSame(
 			$expectation,
-			$this->request_body->getAsBool('data')
+			$this->request_body?->getAsBool('data')
 		);
 	}
 
 	public function testGetAsVectorThrowsExceptionOnNonArray(): void {
-		$this->expectException(IncorrectTypeException::class);
+		$this->expectException(Exception\Request\InvalidRequestParamException::class);
 
 		$this->fillBody(['data' => 'BOOM']);
 
-		$this->request_body->getAsVector('data');
+		$this->request_body?->getAsVector('data');
 	}
 
 	public function testGetAsVectorReturnsVector(): void {
@@ -175,16 +177,16 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(
 			new Vector($data),
-			$this->request_body->getAsVector('data')
+			$this->request_body?->getAsVector('data')
 		);
 	}
 
 	public function testGetAsMapThrowsExceptionOnNonArray(): void {
-		$this->expectException(IncorrectTypeException::class);
+		$this->expectException(Exception\Request\InvalidRequestParamException::class);
 
 		$this->fillBody(['data' => 'BOOM']);
 
-		$this->request_body->getAsMap('data');
+		$this->request_body?->getAsMap('data');
 	}
 
 	public function testGetAsMapReturnsMap(): void {
@@ -194,7 +196,7 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(
 			new Map($data),
-			$this->request_body->getAsMap('data')
+			$this->request_body?->getAsMap('data')
 		);
 	}
 
@@ -205,7 +207,7 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 	private function getRequestBody($input) {
 		$this->fillBody($input);
 
-		return $this->request_body->getBody();	
+		return $this->request_body?->getBody();	
 	}
 
 	public function tearDown() {

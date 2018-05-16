@@ -18,7 +18,7 @@ final class Router implements RouterInterface {
 
 	public function register(string $route, (function (RequestInterface): \JsonSerializable) $callback, ?string $http_method = null): void {
 		if ($http_method !== null) {
-			$route = sprintf(
+			$route = \sprintf(
 				'%s:%s',
 				$http_method,
 				$route
@@ -46,7 +46,7 @@ final class Router implements RouterInterface {
 
 	public function route(string $base_path): void {
 		try {
-			$response = json_encode($this->matchRoute($base_path));
+			$response = \json_encode($this->matchRoute($base_path));
 			$status_code = static::HTTP_OK;
 		} catch (Exception\SharestaException $e) {
 			$response = $e->getMessage();
@@ -66,26 +66,26 @@ final class Router implements RouterInterface {
 
 		foreach ($this->routes as $route => $callback) {
 			// if the route also defines a HTTP method, use it as prefix for the lookup
-			$route_method = strstr($route, ':', true);
+			$route_method = \strstr($route, ':', true);
 			$request_prepend = '';
 
-			if ($route_method && substr($route_method, -1) != '/') {
-				$request_prepend = sprintf('%s:', $http_method);
+			if ($route_method && \substr($route_method, -1) != '/') {
+				$request_prepend = \sprintf('%s:', $http_method);
 			}
 
-			$route_pattern = preg_replace(
+			$route_pattern = \preg_replace(
 				'%/:([^ /?]+)(\?)?%',
 				'/\2(?P<\1>[^ /?]+)\2',
 				$route
 			);
 
 			$uri_params = [];
-			if (preg_match('%^'.$route_pattern.'$%', $request_prepend.$requested_route, &$uri_params)) {
+			if (\preg_match('%^'.$route_pattern.'$%', $request_prepend.$requested_route, &$uri_params)) {
 				if ($callback === null) {
 					throw new Exception\NotFoundException('The requested resource was not found');
 				}
 
-				if (!is_callable($callback)) {
+				if (!\is_callable($callback)) {
 					throw new Exception\ServerException('The provided route callback is not callable');
 				}
 

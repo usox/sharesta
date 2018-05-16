@@ -1,6 +1,6 @@
 {
     "name": "usox/sharesta",
-    "description": "restful json api creation using hack",
+    "description": "restful json api creation using strict hack",
     "type": "library",
     "keywords": ["json", "hack", "hhvm", "api", "restful"],
     "license": "MIT",
@@ -11,16 +11,17 @@
 	}
     ],
     "require": {
-	"hhvm": ">=3.24",
-	"hhvm/type-assert": "^2"
+        "hhvm": ">=3.26",
+        "hhvm/type-assert": "^3"
     },
     "require-dev": {
-	    "phpunit/phpunit": "^5",
-	    "mockery/mockery": "^1"
+        "facebook/fbexpect": "^1",
+        "mockery/mockery": "^1",
+        "hhvm/hhast": "^3.26"
     },
     "autoload": {
         "psr-4": {
-	    "Usox\\Sharesta\\": "src"
+	        "Usox\\Sharesta\\": "src"
         }
     }
 }

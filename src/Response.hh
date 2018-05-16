@@ -18,23 +18,23 @@ final class Response implements ResponseInterface {
 	public function send(): void {
 		if ($this->codes->contains($this->code)) {
 			if (null === $this->body) {
-				$this->body = json_encode(
+				$this->body = \json_encode(
 					$this->codes->get($this->code)
 				);
 			}
 		} else {
 			$this->code = 500;
-			$this->body = json_encode('API attempted to return an unknown HTTP status.');
+			$this->body = \json_encode('API attempted to return an unknown HTTP status.');
 		}
 
-		header(
-			sprintf(
+		\header(
+			\sprintf(
 				'HTTP/1.1 %d %s' ,
 				$this->code,
 				$this->codes->get($this->code)
 			)
 		);
-		header('Content-type: application/json');
+		\header('Content-type: application/json');
 		echo $this->body;
 	}
 }
