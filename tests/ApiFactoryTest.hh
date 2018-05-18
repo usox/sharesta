@@ -1,4 +1,4 @@
-<?hh // partial
+<?hh // strict
 namespace Usox\Sharesta;
 
 class ApiFactoryTest extends \PHPUnit_Framework_TestCase {
@@ -12,14 +12,14 @@ class ApiFactoryTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider factoryMethodsDataProvider
 	 */
-	public function testCreationMethodsReturnInstances(
+	public function testCreationMethodsReturnInstances<T>(
 		string $method_name,
-		classname<I> $expected_class_name,
+		classname<T> $expected_class_name,
 		array<mixed> $parameter
-	) {
+	): void {
 		$this->assertInstanceOf(
 			$expected_class_name,
-			call_user_func_array([$this->api_factory, $method_name], $parameter)
+			\call_user_func_array([$this->api_factory, $method_name], $parameter)
 		);
 	}
 

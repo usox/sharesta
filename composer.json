@@ -12,7 +12,8 @@
     ],
     "require": {
         "hhvm": ">=3.26",
-        "hhvm/type-assert": "^3"
+        "hhvm/type-assert": "^3",
+        "hhvm/hsl": "^3.26"
     },
     "require-dev": {
         "facebook/fbexpect": "^1",

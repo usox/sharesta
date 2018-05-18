@@ -1,65 +1,74 @@
-<?hh // partial
+<?hh // strict
 namespace Usox\Sharesta;
 
+use function Facebook\FBExpect\expect;
+use HH\Lib\{Str, Math};
 use Facebook\TypeAssert\UnsupportedTypeException;
 
 class InputStreamWrapper {
 
-	public static $singleton = null;
-	private $index = 0;
-	private $data = '';
+	public static ?InputStreamWrapper $singleton;
 
-	public function read($count){
-		$length = min($count, strlen($this->data) - $this->index);
-		$data = substr($this->data, $this->index);
+	private int $index = 0;
+
+	private string $data = '';
+
+	public function read(int $count): string {
+		$length = Math\minva($count, Str\length($this->data) - $this->index);
+		$data = Str\slice($this->data, $this->index);
 		$this->index = $this->index + $length;
 		return $data;
 	}
 
-	public function eof() {
-		return $this->index >= strlen($this->data) ? TRUE : FALSE;
+	public function eof(): bool {
+		return $this->index >= Str\length($this->data) ? true : false;
 	}
 
-	public function write($data){
+	public function write(string $data): void {
 		$this->index = 0;
 		$this->data = $data;
 	}
 
-	public function stream_open($path, $mode, $options, &$opened_path){
+	public function stream_open(
+		string $path,
+		string $mode,
+		int $options,
+		?string $opened_path
+	): bool {
 		return true;
 	}
 
-	public function stream_close(){
+	public function stream_close(): void {
 	}
 
-	public function stream_stat(){
+	public function stream_stat(): array<string, string> {
 		return array();
 	}
 
-	public function stream_flush(){
+	public function stream_flush(): bool {
 		return true;
 	}
 
-	private function getSingleton() {
+	private function getSingleton(): InputStreamWrapper {
 		if (static::$singleton === null) {
 			static::$singleton = new InputStreamWrapper();
 		}
 		return static::$singleton;
 	}
 
-	public function stream_read($count) {
+	public function stream_read(int $count): string {
 		return $this->getSingleton()->read($count);
 	}
 
-	public function stream_eof() {
+	public function stream_eof(): bool {
 		return $this->getSingleton()->eof();
 	}
 
-	public function stream_write($data) {
+	public function stream_write(string $data): void {
 		$this->getSingleton()->write($data);
 	}
 
-	public function unlink() {
+	public function unlink(): void {
 	}
 }
 
@@ -72,30 +81,30 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 	private ?RequestBody $request_body;
 
-	public function setUp() {
-		stream_wrapper_unregister('php');
-		stream_wrapper_register('php', InputStreamWrapper::class);
+	public function setUp(): void {
+		\stream_wrapper_unregister('php');
+		\stream_wrapper_register('php', InputStreamWrapper::class);
 		$this->request_body = new RequestBody();
 	}
 
-	public function testWithoutJsonDataThrowsException() {
-		$this->expectException(
+	public function testWithoutJsonDataThrowsException(): void {
+		\file_put_contents('php://input', 'absolutly-no-json');
+
+		expect(
+			function () {
+				$this->request_body?->getBody();
+			}
+		)
+		->toThrow(
 			Exception\RequestException::class
 		);
-
-		file_put_contents('php://input', 'absolutly-no-json');
-
-		$this->request_body?->getBody();
 	}
 
-	public function testWithEmptyBodyReturnsEmptyMap() {
-		$this->assertEquals(
-			Map{},
-			$this->getRequestBody([])
-		);
+	public function testWithEmptyBodyReturnsEmptyMap(): void {
+		expect($this->getRequestBody([]))->toEqual(Map{});
 	}
 
-	public function testWithJsonDataReturnsMap() {
+	public function testWithJsonDataReturnsMap(): void {
 		$request_data = ['data' => 'really'];
 		$data = $this->getRequestBody($request_data);
 
@@ -118,18 +127,23 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->fillBody(['data' => $expectation]);
 
-		$this->assertSame(
-			$expectation,
+		expect(
 			$this->request_body?->getAsString('data')
-		);
+		)
+		->toBeSame($expectation);
 	}
 
 	public function testGetAsIntFailsWithNonInt(): void {
-		$this->expectException(Exception\Request\InvalidRequestParamException::class);
-
 		$this->fillBody(['data' => 'we-want-snoo-snoo']);
 
-		$this->request_body?->getAsInt('data');
+		expect(
+			function() {
+				$this->request_body?->getAsInt('data');
+			}
+		)
+		->toThrow(
+			Exception\Request\InvalidRequestParamException::class
+		);
 	}
 
 	public function testGetAsIntReturnsInt(): void {
@@ -137,18 +151,23 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->fillBody(['data' => $expectation]);
 
-		$this->assertSame(
-			$expectation,
+		expect(
 			$this->request_body?->getAsInt('data')
-		);
+		)
+		->toBeSame($expectation);
 	}
 
 	public function testGetAsIntFailsWithNonBool(): void {
-		$this->expectException(Exception\Request\InvalidRequestParamException::class);
-
 		$this->fillBody(['data' => 'mister-noob-noob']);
 
-		$this->request_body?->getAsBool('data');
+		expect(
+			function() {
+				$this->request_body?->getAsBool('data');
+			}
+		)
+		->toThrow(
+			Exception\Request\InvalidRequestParamException::class
+		);
 	}
 
 	public function testGetAsBoolReturnsBool(): void {
@@ -156,18 +175,23 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->fillBody(['data' => $expectation]);
 
-		$this->assertSame(
-			$expectation,
+		expect(
 			$this->request_body?->getAsBool('data')
-		);
+		)
+		->toBeSame($expectation);
 	}
 
 	public function testGetAsVectorThrowsExceptionOnNonArray(): void {
-		$this->expectException(Exception\Request\InvalidRequestParamException::class);
-
 		$this->fillBody(['data' => 'BOOM']);
 
-		$this->request_body?->getAsVector('data');
+		expect(
+			function() {
+				$this->request_body?->getAsVector('data');
+			}
+		)
+		->toThrow(
+			Exception\Request\InvalidRequestParamException::class
+		);
 	}
 
 	public function testGetAsVectorReturnsVector(): void {
@@ -175,18 +199,25 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->fillBody(['data' => $data]);
 
-		$this->assertEquals(
-			new Vector($data),
+		expect(
 			$this->request_body?->getAsVector('data')
+		)
+		->toEqual(
+			new Vector($data)
 		);
 	}
 
 	public function testGetAsMapThrowsExceptionOnNonArray(): void {
-		$this->expectException(Exception\Request\InvalidRequestParamException::class);
-
 		$this->fillBody(['data' => 'BOOM']);
 
-		$this->request_body?->getAsMap('data');
+		expect(
+			function () {
+				$this->request_body?->getAsMap('data');
+			}
+		)
+		->toThrow(
+			Exception\Request\InvalidRequestParamException::class
+		);
 	}
 
 	public function testGetAsMapReturnsMap(): void {
@@ -194,23 +225,25 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 		$this->fillBody(['data' => $data]);
 
-		$this->assertEquals(
-			new Map($data),
+		expect(
 			$this->request_body?->getAsMap('data')
+		)
+		->toEqual(
+			new Map($data)
 		);
 	}
 
 	private function fillBody(array<string, mixed> $body): void {
-		file_put_contents('php://input', json_encode($body));
+		\file_put_contents('php://input', \json_encode($body));
 	}
 
-	private function getRequestBody($input) {
+	private function getRequestBody(array<string, mixed>$input): ?Map<string, mixed> {
 		$this->fillBody($input);
 
 		return $this->request_body?->getBody();	
 	}
 
-	public function tearDown() {
-		stream_wrapper_restore('php');
+	public function tearDown(): void {
+		\stream_wrapper_restore('php');
 	}
 }
