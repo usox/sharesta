@@ -5,10 +5,10 @@
     "keywords": ["json", "hack", "hhvm", "api", "restful"],
     "license": "MIT",
     "authors": [
-	{
-	    "name": "Daniel Jakob",
-	    "email": "dev@usox.org"
-	}
+        {
+            "name": "Daniel Jakob",
+            "email": "dev@usox.org"
+        }
     ],
     "require": {
         "hhvm": ">=3.26",
