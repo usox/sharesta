@@ -21,8 +21,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 	private string $default_result = 'roedlbroem';
 
 	public function setUp(): void {
+		$this->result = $this->createMock(\JsonSerializable::class);
 		// UNSAFE
-		$this->result = \Mockery::mock(\JsonSerializable::class);
 		$this->request = \Mockery::mock(RequestInterface::class);
 		$this->api_factory = \Mockery::mock(ApiFactoryInterface::class);
 		$this->response = \Mockery::mock(ResponseInterface::class);
@@ -46,6 +46,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			}))
 			->once();
 
+		$this->result
+			?->expects(static::once())
+			?->method('jsonSerialize')
+			?->willReturn($this->default_result);
+
 		$this->api_factory
 			->shouldReceive('createResponse')
 			->with(Router::HTTP_OK, Str\format('"%s"', $this->default_result))
@@ -55,11 +60,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		$this->response
 			->shouldReceive('send')
 			->once();
-
-		$this->result
-			->shouldReceive('jsonSerialize')
-			->once()
-			->andReturn($this->default_result);
 
 		expect(
 			$this->router?->route($this->base_path)
@@ -137,9 +137,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			->times(4);
 
 		$this->result
-			->shouldReceive('jsonSerialize')
-			->times(4)
-			->andReturn($this->default_result);
+			?->expects(static::exactly(4))
+			?->method('jsonSerialize')
+			?->willReturn($this->default_result);
 
 		$this->createRequest('gettest/12/name', 'GET');
 
@@ -183,9 +183,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			->times(4);
 
 		$this->result
-			->shouldReceive('jsonSerialize')
-			->times(4)
-			->andReturn($this->default_result);
+			?->expects(static::exactly(4))
+			?->method('jsonSerialize')
+			?->willReturn($this->default_result);
 
 		$this->createRequest('gettest/12/name', 'GET');
 
