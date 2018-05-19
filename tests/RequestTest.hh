@@ -1,9 +1,12 @@
-<?hh
+<?hh // strict
 namespace Usox\Sharesta;
+
+use function Facebook\FBExpect\expect;
 
 class RequestTest extends \PHPUnit_Framework_TestCase {
 
-	public function testRequestEstablishesPropertiesOnCreation() {
+	public function testRequestEstablishesPropertiesOnCreation(): void {
+		// UNSAFE
 		$_SERVER['REQUEST_URI'] = '/api/test/sub/1';
 		$_SERVER['REQUEST_METHOD'] = 'GET';
 		$_GET = array('a' => '1', 'b' => '2');
@@ -15,8 +18,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 		);
 		$uri_values = $request->getUriValues();
 
-		$this->assertEquals('test/sub/1', $request->getRoute('/api/'));
-		$this->assertEquals('GET', $request->getHttpMethod());
-		$this->assertEquals('2', $uri_values->get('b'));
+		expect($request->getRoute('/api/'))->toBeSame('test/sub/1');
+		expect($request->getHttpMethod())->toBeSame('GET');
+		expect($uri_values->get('b'))->toBeSame('2');
 	}
 }

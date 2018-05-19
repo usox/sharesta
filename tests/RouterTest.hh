@@ -1,17 +1,31 @@
-<?hh // decl
+<?hh // strict
 namespace Usox\Sharesta;
+
+use function Facebook\FBExpect\expect;
+use HH\Lib\Str;
 
 class RouterTest extends \PHPUnit_Framework_TestCase {
 
-	public function setUp() {
+	private ?\JsonSerializable $result;
+
+	private ?RequestInterface $request;
+
+	private ?ApiFactoryInterface $api_factory;
+
+	private ?ResponseInterface $response;
+
+	private ?Router $router;
+
+	private string $base_path = 'some-nice-path';
+
+	private string $default_result = 'roedlbroem';
+
+	public function setUp(): void {
+		// UNSAFE
 		$this->result = \Mockery::mock(\JsonSerializable::class);
-		$this->callable = function(RequestInterface $request): \JsonSerializable { return $this->result; };
-		$this->base_path = 'some-nice-path';
 		$this->request = \Mockery::mock(RequestInterface::class);
 		$this->api_factory = \Mockery::mock(ApiFactoryInterface::class);
 		$this->response = \Mockery::mock(ResponseInterface::class);
-
-		$this->default_result = 'roedlbroem';
 
 		$this->router = new Router(
 			$this->api_factory,
@@ -19,11 +33,12 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
-	public function testRouterMatchesRequestCorrectly() {
-		$this->router->register('users/:id/:field', $this->callable);
+	public function testRouterMatchesRequestCorrectly(): void {
+		$this->router?->register('users/:id/:field', $this->getCallable());
 
 		$this->createRequest('users/12/name', 'GET');
 
+		// UNSAFE
 		$this->request
 			->shouldReceive('setRouteParameters')
 			->with(\Mockery::on(function ($value) {
@@ -33,7 +48,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->api_factory
 			->shouldReceive('createResponse')
-			->with(Router::HTTP_OK, sprintf('"%s"', $this->default_result))
+			->with(Router::HTTP_OK, Str\format('"%s"', $this->default_result))
 			->once()
 			->andReturn($this->response);
 
@@ -46,12 +61,14 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			->once()
 			->andReturn($this->default_result);
 
-		$this->assertNull(
-			$this->router->route($this->base_path)
-		);
+		expect(
+			$this->router?->route($this->base_path)
+		)
+		->toBeNull();
 	}
 
-	public function testRouterCatchesDefaultExceptionCorrectly() {
+	public function testRouterCatchesDefaultExceptionCorrectly(): void {
+		// UNSAFE
 		$this->request
 			->shouldReceive('getRoute')
 			->once()
@@ -66,15 +83,19 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		$this->response
 			->shouldReceive('send')
 			->once();
-
-		$this->router->route($this->base_path);
+		
+		expect(
+			$this->router?->route($this->base_path)
+		)
+		->toBeNull();
 	}
 
-	public function testRouterFailsToMatchRequestCorrectly() {
-		$this->router->register('foo/:id/:field', $this->callable);
+	public function testRouterFailsToMatchRequestCorrectly(): void {
+		$this->router?->register('foo/:id/:field', $this->getCallable());
 
 		$this->createRequest('/api/users/12/name', 'GET');
 
+		// UNSAFE
 		$this->api_factory
 			->shouldReceive('createResponse')
 			->with(Router::HTTP_NOT_FOUND, 'The requested resource was not found')
@@ -85,15 +106,19 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			->shouldReceive('send')
 			->once();
 
-		$this->router->route($this->base_path);
+		expect(
+			$this->router?->route($this->base_path)
+		)
+		->toBeNull();
 	}
 
-	public function testRouterMatchesSpecificHTTPMethodCorrectly() {
-		$this->router->register('gettest/:id/:field', $this->callable, 'GET');
-		$this->router->register('posttest/:id/:field', $this->callable, 'POST');
-		$this->router->register('puttest/:id/:field', $this->callable, 'PUT');
-		$this->router->register('deltest/:id/:field', $this->callable, 'DELETE');
+	public function testRouterMatchesSpecificHTTPMethodCorrectly(): void {
+		$this->router?->register('gettest/:id/:field', $this->getCallable(), 'GET');
+		$this->router?->register('posttest/:id/:field', $this->getCallable(), 'POST');
+		$this->router?->register('puttest/:id/:field', $this->getCallable(), 'PUT');
+		$this->router?->register('deltest/:id/:field', $this->getCallable(), 'DELETE');
 
+		// UNSAFE
 		$this->request
 			->shouldReceive('setRouteParameters')
 			->with(\Mockery::on(function ($value) {
@@ -103,7 +128,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->api_factory
 			->shouldReceive('createResponse')
-			->with(Router::HTTP_OK, sprintf('"%s"', $this->default_result))
+			->with(Router::HTTP_OK, Str\format('"%s"', $this->default_result))
 			->times(4)
 			->andReturn($this->response);
 
@@ -118,27 +143,28 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->createRequest('gettest/12/name', 'GET');
 
-		$this->assertNull($this->router->route($this->base_path));
+		expect($this->router?->route($this->base_path))->toBeNull();
 
 		$this->createRequest('posttest/12/name', 'POST');
 
-		$this->assertNull($this->router->route($this->base_path));
+		expect($this->router?->route($this->base_path))->toBeNull();
 
 		$this->createRequest('puttest/12/name', 'PUT');
 
-		$this->assertNull($this->router->route($this->base_path));
+		expect($this->router?->route($this->base_path))->toBeNull();
 
 		$this->createRequest('deltest/12/name', 'DELETE');
 
-		$this->assertNull($this->router->route($this->base_path));
+		expect($this->router?->route($this->base_path))->toBeNull();
 	}
 
-	public function testRouterMatchesSpecificHTTPMethodCorrectlyUsingShortcuts() {
-		$this->router->get('gettest/:id/:field', $this->callable);
-		$this->router->post('posttest/:id/:field', $this->callable);
-		$this->router->put('puttest/:id/:field', $this->callable);
-		$this->router->delete('deltest/:id/:field', $this->callable);
+	public function testRouterMatchesSpecificHTTPMethodCorrectlyUsingShortcuts(): void {
+		$this->router?->get('gettest/:id/:field', $this->getCallable());
+		$this->router?->post('posttest/:id/:field', $this->getCallable());
+		$this->router?->put('puttest/:id/:field', $this->getCallable());
+		$this->router?->delete('deltest/:id/:field', $this->getCallable());
 
+		// UNSAFE
 		$this->request
 			->shouldReceive('setRouteParameters')
 			->with(\Mockery::on(function ($value) {
@@ -148,7 +174,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->api_factory
 			->shouldReceive('createResponse')
-			->with(Router::HTTP_OK, sprintf('"%s"', $this->default_result))
+			->with(Router::HTTP_OK, Str\format('"%s"', $this->default_result))
 			->times(4)
 			->andReturn($this->response);
 
@@ -163,23 +189,33 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		$this->createRequest('gettest/12/name', 'GET');
 
-		$this->assertNull($this->router->route($this->base_path));
+		expect($this->router?->route($this->base_path))->toBeNull();
 
 		$this->createRequest('posttest/12/name', 'POST');
 
-		$this->assertNull($this->router->route($this->base_path));
+		expect($this->router?->route($this->base_path))->toBeNull();
 
 		$this->createRequest('puttest/12/name', 'PUT');
 
-		$this->assertNull($this->router->route($this->base_path));
+		expect($this->router?->route($this->base_path))->toBeNull();
 
 		$this->createRequest('deltest/12/name', 'DELETE');
 
-		$this->assertNull($this->router->route($this->base_path));
+		expect($this->router?->route($this->base_path))->toBeNull();
 	}
 
 	private function createRequest(string $route, string $http_method): void {
+		// UNSAFE
 		$this->request->shouldReceive('getRoute')->once()->andReturn($route);
 		$this->request->shouldReceive('getHttpMethod')->once()->andReturn($http_method);
+	}
+
+	private function getCallable(): (function(RequestInterface): \JsonSerializable) {
+		return function(RequestInterface $request): \JsonSerializable {
+			if ($this->result !== null) {
+				return $this->result;
+			}
+			throw new \Exception();
+		};
 	}
 }
