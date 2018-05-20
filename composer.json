@@ -11,14 +11,14 @@
         }
     ],
     "require": {
-        "hhvm": ">=3.26",
+        "hhvm": ">=3.26.0",
         "hhvm/type-assert": "^3",
-        "hhvm/hsl": "^3.26"
+        "hhvm/hsl": "^3.26.0|^1"
     },
     "require-dev": {
         "facebook/fbexpect": "^1",
-        "mockery/mockery": "^1",
-        "hhvm/hhast": "^3.26"
+        "hhvm/hhast": "^3.26",
+        "usox/hackmock": "dev-master"
     },
     "autoload": {
         "psr-4": {
