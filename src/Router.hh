@@ -83,13 +83,6 @@ final class Router implements RouterInterface {
 
 			$uri_params = [];
 			if (\preg_match('%^'.$route_pattern.'$%', $request_prepend.$requested_route, &$uri_params)) {
-				if ($callback === null) {
-					throw new Exception\NotFoundException('The requested resource was not found');
-				}
-
-				if (!\is_callable($callback)) {
-					throw new Exception\ServerException('The provided route callback is not callable');
-				}
 
 				foreach ($uri_params as $key => $value) {
 					if (!is_numeric($key)) {
