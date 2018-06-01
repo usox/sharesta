@@ -7,13 +7,13 @@ interface RequestInterface {
 
 	public function getHttpMethod(): string;
 
-	public function getRouteParameters(): ImmMap<string,string>;
+	public function getRouteParameters(): dict<string, string>;
 
-	public function setRouteParameters(ImmMap<string, string> $route_parameters): void;
+	public function setRouteParameters(dict<string, string> $route_parameters): void;
 
-	public function getUriValues(): ImmMap<string,string>;
+	public function getUriValues(): dict<string, string>;
 
 	public function getBodyAsJson(): string;
 
-	public function getBody(): Map<string,mixed>;
+	public function getBody(): dict<string, mixed>;
 }

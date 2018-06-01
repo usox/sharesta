@@ -3,7 +3,7 @@ namespace Usox\Sharesta;
 
 interface RequestBodyInterface {
 
-	public function getBody(): Map<string,mixed>;
+	public function getBody(): dict<string, mixed>;
 
 	public function getAsString(string $key): string;
 
@@ -11,7 +11,7 @@ interface RequestBodyInterface {
 
 	public function getAsBool(string $key): bool;
 
-	public function getAsVector(string $key): Vector<mixed>;
+	public function getAsVec(string $key): vec<mixed>;
 
-	public function getAsMap(string $key): Map<mixed, mixed>;
+	public function getAsDict(string $key): dict<mixed, mixed>;
 }

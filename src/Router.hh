@@ -16,7 +16,7 @@ final class Router implements RouterInterface {
 	): void {
 	}
 
-	private Map<string, (function (RequestInterface): \JsonSerializable)> $routes = Map {};
+	private dict<string, (function (RequestInterface): \JsonSerializable)> $routes = dict[];
 
 	public function register(string $route, (function (RequestInterface): \JsonSerializable) $callback, ?string $http_method = null): void {
 		if ($http_method !== null) {
@@ -27,7 +27,7 @@ final class Router implements RouterInterface {
 			);
 		}
 
-		$this->routes->add(Pair {$route, $callback});
+		$this->routes[$route] = $callback;
 	}
 
 	public function get(string $route, (function (RequestInterface): \JsonSerializable) $callback): void {
@@ -64,7 +64,7 @@ final class Router implements RouterInterface {
 	private function matchRoute(string $base_path): \JsonSerializable {
 		$requested_route = $this->request->getRoute($base_path);
 		$http_method = $this->request->getHttpMethod();
-		$route_parameters = Map{};
+		$route_parameters = dict([]);
 
 		foreach ($this->routes as $route => $callback) {
 			// if the route also defines a HTTP method, use it as prefix for the lookup
@@ -93,10 +93,10 @@ final class Router implements RouterInterface {
 
 				foreach ($uri_params as $key => $value) {
 					if (!is_numeric($key)) {
-						$route_parameters->add(Pair {$key, $value});
+						$route_parameters[$key] = $value;
 					}
 				}
-				$this->request->setRouteParameters($route_parameters->toImmMap());
+				$this->request->setRouteParameters($route_parameters);
 
 				return $callback($this->request);
 			}

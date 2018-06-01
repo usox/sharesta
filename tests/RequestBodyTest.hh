@@ -100,16 +100,16 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
-	public function testWithEmptyBodyReturnsEmptyMap(): void {
-		expect($this->getRequestBody([]))->toEqual(Map{});
+	public function testWithEmptyBodyReturnsEmptyDict(): void {
+		expect($this->getRequestBody([]))->toEqual(dict([]));
 	}
 
-	public function testWithJsonDataReturnsMap(): void {
+	public function testWithJsonDataReturnsDict(): void {
 		$request_data = ['data' => 'really'];
 		$data = $this->getRequestBody($request_data);
 
 		$this->assertEquals(
-			new Map($request_data),
+			dict($request_data),
 			$data
 		);
 	}
@@ -181,38 +181,32 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 		->toBeSame($expectation);
 	}
 
-	public function testGetAsVectorThrowsExceptionOnNonArray(): void {
+	public function testGetAsVecThrowsExceptionOnNonArray(): void {
 		$this->fillBody(['data' => 'BOOM']);
 
-		expect(
-			function() {
-				$this->request_body?->getAsVector('data');
-			}
-		)
+		expect(() ==> $this->request_body?->getAsVec('data'))
 		->toThrow(
 			Exception\Request\InvalidRequestParamException::class
 		);
 	}
 
-	public function testGetAsVectorReturnsVector(): void {
+	public function testGetAsVecReturnsVector(): void {
 		$data = ['I-will-be-ignored' => 'Me-not'];
 
 		$this->fillBody(['data' => $data]);
 
 		expect(
-			$this->request_body?->getAsVector('data')
+			$this->request_body?->getAsVec('data')
 		)
-		->toEqual(
-			new Vector($data)
-		);
+		->toEqual(vec($data));
 	}
 
-	public function testGetAsMapThrowsExceptionOnNonArray(): void {
+	public function testGetAsDictThrowsExceptionOnNonArray(): void {
 		$this->fillBody(['data' => 'BOOM']);
 
 		expect(
 			function () {
-				$this->request_body?->getAsMap('data');
+				$this->request_body?->getAsDict('data');
 			}
 		)
 		->toThrow(
@@ -220,24 +214,22 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
-	public function testGetAsMapReturnsMap(): void {
+	public function testGetAsDictReturnsDict(): void {
 		$data = ['da-key' => 'da-value'];
 
 		$this->fillBody(['data' => $data]);
 
 		expect(
-			$this->request_body?->getAsMap('data')
+			$this->request_body?->getAsDict('data')
 		)
-		->toEqual(
-			new Map($data)
-		);
+		->toEqual(dict($data));
 	}
 
 	private function fillBody(array<string, mixed> $body): void {
 		\file_put_contents('php://input', \json_encode($body));
 	}
 
-	private function getRequestBody(array<string, mixed>$input): ?Map<string, mixed> {
+	private function getRequestBody(array<string, mixed>$input): ?dict<string, mixed> {
 		$this->fillBody($input);
 
 		return $this->request_body?->getBody();	

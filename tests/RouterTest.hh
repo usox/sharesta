@@ -30,7 +30,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			->andReturn($response);
 
 		prospect($request, 'setRouteParameters')
-			->with(dict['id' => 12, 'field' => 'name'])
+			->with(dict['id' => '12', 'field' => 'name'])
 			->times(1);
 		prospect($request, 'getRoute')
 			->times(1)
@@ -116,7 +116,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			->andReturn($this->default_result);
 
 		prospect($request, 'setRouteParameters')
-			->with(dict['id' => 12, 'field' => 'name'])
+			->with(dict['id' => '12', 'field' => 'name'])
 			->times(4);
 
 		prospect($response, 'send')
@@ -127,15 +127,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			->times(4)
 			->andReturn($response);
 
-		$test = function (
+		$test = (
 			string $route,
 			string $route_base,
 			string $method
-		) use (
-			$request,
-			$api_factory,
-			$result
-		) {
+		) ==> {
 			prospect($request, 'getRoute')
 				->times(1)
 				->andReturn($route);

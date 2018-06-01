@@ -23,7 +23,7 @@ class GetSomeIdRoute implements \JsonSerializable {
 	}
 
 	public function doSomeFancyMagic(): void {
-		$this->request_id = $this->request->getRouteParameters()->get('id');
+		$this->request_id = $this->request->getRouteParameters()['id'];
 	}
 
 	public function jsonSerialize(): string {
@@ -49,8 +49,8 @@ function init() {
 	$factory = new ApiFactory();
 
 	$router = $factory->createRouter(
-		new ImmMap($_SERVER),
-		new ImmMap($_GET)
+		dict($_SERVER),
+		dict($_GET)
 	);
 
 	$routes = new Routes();

@@ -4,8 +4,8 @@ namespace Usox\Sharesta;
 final class ApiFactory implements ApiFactoryInterface {
 
 	public function createRouter(
-		ImmMap<string,string> $get_vars,
-		ImmMap<string,string> $server_vars
+		dict<string,string> $get_vars,
+		dict<string,string> $server_vars
 	): RouterInterface {
 		return new Router(
 			$this,

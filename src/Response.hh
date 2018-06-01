@@ -29,14 +29,14 @@ final class Response implements ResponseInterface {
 			$this->body = \json_encode('API attempted to return an unknown HTTP status.');
 		}
 
-		\header(
+		@\header(
 			Str\format(
 				'HTTP/1.1 %d %s' ,
 				$this->code,
 				(string) $this->codes->get($this->code)
 			)
 		);
-		\header('Content-type: application/json');
+		@\header('Content-type: application/json');
 		echo $this->body;
 	}
 }

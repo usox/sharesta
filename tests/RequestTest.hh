@@ -12,14 +12,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 		$_GET = array('a' => '1', 'b' => '2');
 
 		$request = new Request(
-			new ImmMap($_SERVER),
-			new ImmMap($_GET),
+			dict($_SERVER),
+			dict($_GET),
 			new RequestBody()
 		);
 		$uri_values = $request->getUriValues();
 
 		expect($request->getRoute('/api/'))->toBeSame('test/sub/1');
 		expect($request->getHttpMethod())->toBeSame('GET');
-		expect($uri_values->get('b'))->toBeSame('2');
+		expect($uri_values['b'])->toBeSame('2');
 	}
 }
