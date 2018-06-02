@@ -72,11 +72,6 @@ class InputStreamWrapper {
 	}
 }
 
-/**
- * Class: RequestBodyTest
- *
- * @see \PHPUnit_Framework_TestCase
- */
 class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 
 	private ?RequestBody $request_body;

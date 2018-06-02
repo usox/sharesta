@@ -15,7 +15,7 @@ class ApiFactoryTest extends \PHPUnit_Framework_TestCase {
 	public function testCreationMethodsReturnInstances<T>(
 		string $method_name,
 		classname<T> $expected_class_name,
-		array<mixed> $parameter
+		vec<mixed> $parameter
 	): void {
 		$this->assertInstanceOf(
 			$expected_class_name,
@@ -25,8 +25,8 @@ class ApiFactoryTest extends \PHPUnit_Framework_TestCase {
 
 	public function factoryMethodsDataProvider(): array<mixed> {
 		return [
-			['createRouter', Router::class, [dict([]), dict([])]],
-			['createResponse', Response::class, [666, 'roedlbroem']],
+			['createRouter', Router::class, vec[dict([]), dict([])]],
+			['createResponse', Response::class, vec[666, 'roedlbroem']],
 		];
 	}
 }
