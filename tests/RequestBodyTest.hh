@@ -96,7 +96,7 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testWithEmptyBodyReturnsEmptyDict(): void {
-		expect($this->getRequestBody([]))->toEqual(dict([]));
+		expect($this->getRequestBody([]))->toBeSame(dict([]));
 	}
 
 	public function testWithJsonDataReturnsDict(): void {
@@ -193,7 +193,7 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 		expect(
 			$this->request_body?->getAsVec('data')
 		)
-		->toEqual(vec($data));
+		->toBeSame(vec($data));
 	}
 
 	public function testGetAsDictThrowsExceptionOnNonArray(): void {
@@ -217,7 +217,7 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 		expect(
 			$this->request_body?->getAsDict('data')
 		)
-		->toEqual(dict($data));
+		->toBeSame(dict($data));
 	}
 
 	private function fillBody(array<string, mixed> $body): void {
