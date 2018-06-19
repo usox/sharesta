@@ -13,12 +13,12 @@
     "require": {
         "hhvm": ">=3.27",
         "hhvm/type-assert": "^3",
-        "hhvm/hsl": "^3.27"
+        "hhvm/hsl": "^3.27",
+        "usox/hackmock": "^0"
     },
     "require-dev": {
         "facebook/fbexpect": "^1",
-        "hhvm/hhast": "^3.27",
-        "usox/hackmock": "^0"
+        "hhvm/hhast": "^3.27"
     },
     "autoload": {
         "psr-4": {
