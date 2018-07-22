@@ -1,8 +1,7 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
-use Facebook\TypeAssert\UnsupportedTypeException;
-use Facebook\TypeAssert;
+use namespace Facebook\TypeAssert;
 
 final class RequestBody implements RequestBodyInterface {
 

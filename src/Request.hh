@@ -1,7 +1,7 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
-use HH\Lib\{C, Dict, Str};
+use namespace HH\Lib\{C, Str};
 
 final class Request implements RequestInterface {
 
@@ -30,7 +30,7 @@ final class Request implements RequestInterface {
 		}
 
 		$route = \rtrim($route, '/');
-		if ($route == '') {
+		if ($route === '') {
 			$route = '/';
 		}
 

@@ -1,7 +1,7 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
-use HH\Lib\Str;
+use namespace HH\Lib\Str;
 
 final class Router implements RouterInterface {
 
@@ -71,7 +71,7 @@ final class Router implements RouterInterface {
 			$route_method = \strstr($route, ':', true);
 			$request_prepend = '';
 
-			if ($route_method && \substr($route_method, -1) != '/') {
+			if ($route_method && \substr($route_method, -1) !== '/') {
 				$request_prepend = Str\format('%s:', $http_method);
 			}
 

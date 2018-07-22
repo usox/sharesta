@@ -1,7 +1,7 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
-use HH\Lib\Str;
+use namespace HH\Lib\Str;
 
 final class Response implements ResponseInterface {
 
