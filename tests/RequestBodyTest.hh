@@ -72,17 +72,19 @@ class InputStreamWrapper {
 	}
 }
 
-class RequestBodyTest extends \PHPUnit_Framework_TestCase {
+class RequestBodyTest extends \Facebook\HackTest\HackTestCase {
 
 	private ?RequestBody $request_body;
 
-	public function setUp(): void {
+	private function setUp(): void {
 		\stream_wrapper_unregister('php');
 		\stream_wrapper_register('php', InputStreamWrapper::class);
 		$this->request_body = new RequestBody();
 	}
 
 	public function testWithoutJsonDataThrowsException(): void {
+		$this->setUp();
+
 		\file_put_contents('php://input', 'absolutly-no-json');
 
 		expect(
@@ -96,25 +98,29 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testWithEmptyBodyReturnsEmptyDict(): void {
+		$this->setUp();
+
 		expect($this->getRequestBody([]))->toBeSame(dict([]));
 	}
 
 	public function testWithJsonDataReturnsDict(): void {
+		$this->setUp();
 		$request_data = ['data' => 'really'];
 		$data = $this->getRequestBody($request_data);
 
-		$this->assertEquals(
-			dict($request_data),
-			$data
-		);
+		expect($data)
+		->toBeSame(dict($request_data));
 	}
 
 	public function testGetAsStringFailsWithNonString(): void {
-		$this->expectException(Exception\Request\InvalidRequestParamException::class);
-
 		$this->fillBody(['data' => 123]);
 
-		$this->request_body?->getAsString('data');
+		expect(
+			() ==> $this->request_body?->getAsString('data')
+		)
+		->toThrow(
+			Exception\Request\InvalidRequestParamException::class
+		);
 	}
 
 	public function testGetAsStringReturnsString(): void {
@@ -220,17 +226,14 @@ class RequestBodyTest extends \PHPUnit_Framework_TestCase {
 		->toBeSame(dict($data));
 	}
 
-	private function fillBody(array<string, mixed> $body): void {
-		\file_put_contents('php://input', \json_encode($body));
-	}
-
 	private function getRequestBody(array<string, mixed>$input): ?dict<string, mixed> {
 		$this->fillBody($input);
 
 		return $this->request_body?->getBody();	
 	}
 
-	public function tearDown(): void {
-		\stream_wrapper_restore('php');
+	private function fillBody(array<string, mixed> $body): void {
+		$this->setUp();
+		\file_put_contents('php://input', \json_encode($body));
 	}
 }

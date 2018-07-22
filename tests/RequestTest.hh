@@ -3,7 +3,7 @@ namespace Usox\Sharesta;
 
 use function Facebook\FBExpect\expect;
 
-class RequestTest extends \PHPUnit_Framework_TestCase {
+class RequestTest extends \Facebook\HackTest\HackTestCase {
 
 	public function testRequestEstablishesPropertiesOnCreation(): void {
 		$request = new Request(

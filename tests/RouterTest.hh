@@ -5,7 +5,7 @@ use function Facebook\FBExpect\expect;
 use function Usox\HackMock\{mock, prospect};
 use HH\Lib\Str;
 
-class RouterTest extends \PHPUnit_Framework_TestCase {
+class RouterTest extends \Facebook\HackTest\HackTestCase {
 
 	private string $base_path = 'some-nice-path';
 
@@ -34,6 +34,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 			->times(1);
 		prospect($request, 'getRoute')
 			->times(1)
+			->with($this->base_path)
 			->andReturn('users/12/name');
 		prospect($request, 'getHttpMethod')
 			->times(1)
@@ -59,6 +60,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		prospect($request, 'getRoute')
 			->times(1)
+			->with($this->base_path)
 			->andThrow(new \Exception());
 
 		prospect($api_factory, 'createResponse')
@@ -82,6 +84,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 
 		prospect($request, 'getRoute')
 			->times(1)
+			->with($this->base_path)
 			->andReturn('/api/users/12/name');
 		prospect($request, 'getHttpMethod')
 			->times(1)
@@ -134,6 +137,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
 		) ==> {
 			prospect($request, 'getRoute')
 				->times(1)
+				->with($this->base_path)
 				->andReturn($route);
 			prospect($request, 'getHttpMethod')
 				->times(1)

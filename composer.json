@@ -14,7 +14,8 @@
         "hhvm": ">=3.27",
         "hhvm/type-assert": "^3",
         "hhvm/hsl": "^3.27",
-        "usox/hackmock": "^0"
+        "usox/hackmock": "^0",
+        "hhvm/hacktest": "^0"
     },
     "require-dev": {
         "facebook/fbexpect": "^1",
