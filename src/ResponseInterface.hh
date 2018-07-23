@@ -3,5 +3,5 @@ namespace Usox\Sharesta;
 
 interface ResponseInterface {
 
-	public function send(): void;
+	public function send(vec<string> $response_header): void;
 }

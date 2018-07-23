@@ -10,6 +10,8 @@ final class Router implements RouterInterface {
 	const HTTP_NOT_FOUND = 404;
 	const HTTP_INTERNAL_SERVER_ERROR = 500;
 
+	private vec<string> $response_headers = vec[];
+
 	public function __construct(
 		private ApiFactoryInterface $api_factory,
 		private RequestInterface $request
@@ -58,7 +60,16 @@ final class Router implements RouterInterface {
 			$status_code = static::HTTP_INTERNAL_SERVER_ERROR;
 		}
 
-		$this->api_factory->createResponse($status_code, $response)->send();
+		$this->api_factory->createResponse(
+			$status_code,
+			$response
+		)->send(
+			$this->response_headers
+		);
+	}
+
+	public function addResponseHeader(string $header): void {
+		$this->response_headers[] = $header;
 	}
 
 	private function matchRoute(string $base_path): \JsonSerializable {

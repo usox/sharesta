@@ -17,7 +17,10 @@ class RouterTest extends \Facebook\HackTest\HackTestCase {
 		$response = mock(ResponseInterface::class);
 		$request = mock(RequestInterface::class);
 
+		$header = 'some-fancy-header';
+
 		prospect($response, 'send')
+			->with(vec[$header])
 			->times(1);
 
 		prospect($result, 'jsonSerialize')
@@ -46,6 +49,7 @@ class RouterTest extends \Facebook\HackTest\HackTestCase {
 		);
 
 		$router->register('users/:id/:field', function($request) use ($result) { return $result; });
+		$router->addResponseHeader($header);
 
 		$router->route($this->base_path);
 	}
@@ -56,6 +60,7 @@ class RouterTest extends \Facebook\HackTest\HackTestCase {
 		$request = mock(RequestInterface::class);
 
 		prospect($response, 'send')
+			->with(vec[])
 			->times(1);
 
 		prospect($request, 'getRoute')
@@ -91,6 +96,7 @@ class RouterTest extends \Facebook\HackTest\HackTestCase {
 			->andReturn('GET');
 
 		prospect($response, 'send')
+			->with(vec[])
 			->times(1);
 
 		prospect($api_factory, 'createResponse')
@@ -123,6 +129,7 @@ class RouterTest extends \Facebook\HackTest\HackTestCase {
 			->times(4);
 
 		prospect($response, 'send')
+			->with(vec[])
 			->times(4);
 
 		prospect($api_factory, 'createResponse')

@@ -27,7 +27,7 @@ class ResponseTest extends \Facebook\HackTest\HackTestCase {
 
 	private function getOutput(ResponseInterface $response): string {
 		\ob_start();
-		$response->send();
+		$response->send(vec[]);
 		$result = \ob_get_contents();
 		\ob_end_clean();
 

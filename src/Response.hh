@@ -1,27 +1,27 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
-use namespace HH\Lib\Str;
+use namespace HH\Lib\{C, Str, Vec};
 
 final class Response implements ResponseInterface {
 
-	private Map<int, string> $codes = Map {
+	private dict<int, string> $codes = dict[
 		Router::HTTP_OK => 'OK',
 		Router::HTTP_BAD_REQUEST => 'Bad Request',
 		Router::HTTP_NOT_FOUND => 'Not Found',
 		Router::HTTP_INTERNAL_SERVER_ERROR => 'Internal Server Error',
-	};
+	];
 
 	public function __construct(
 		private int $code,
 		private ?string $body
 	) {}
 
-	public function send(): void {
-		if ($this->codes->contains($this->code)) {
+	public function send(vec<string> $response_header): void {
+		if (C\contains_key($this->codes, $this->code)) {
 			if (null === $this->body) {
 				$this->body = \json_encode(
-					$this->codes->get($this->code)
+					$this->codes[$this->code]
 				);
 			}
 		} else {
@@ -29,14 +29,16 @@ final class Response implements ResponseInterface {
 			$this->body = \json_encode('API attempted to return an unknown HTTP status.');
 		}
 
-		@\header(
-			Str\format(
-				'HTTP/1.1 %d %s' ,
-				$this->code,
-				(string) $this->codes->get($this->code)
-			)
+		$response_header = Vec\concat(
+			vec[Str\format('HTTP/1.1 %d %s', $this->code, (string) $this->codes[$this->code])],
+			vec['Content-type: application/json'],
+			$response_header,
 		);
-		@\header('Content-type: application/json');
+
+		foreach ($response_header as $header) {
+			@\header($header);
+		}
+
 		echo $this->body;
 	}
 }

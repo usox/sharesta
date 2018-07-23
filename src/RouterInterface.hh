@@ -14,4 +14,6 @@ interface RouterInterface {
 	public function delete(string $route, (function (RequestInterface): \JsonSerializable) $callback): void;
 
 	public function route(string $base_path): void;
+
+	public function addResponseHeader(string $header): void;
 }
