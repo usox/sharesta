@@ -13,5 +13,5 @@ interface RequestBodyInterface {
 
 	public function getAsVec(string $key): vec<mixed>;
 
-	public function getAsDict(string $key): dict<mixed, mixed>;
+	public function getAsDict(string $key): dict<string, mixed>;
 }

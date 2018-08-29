@@ -52,7 +52,7 @@ final class RequestBody implements RequestBodyInterface {
 		return vec($value);
 	}
 
-	public function getAsDict(string $key): dict<mixed, mixed> {
+	public function getAsDict(string $key): dict<string, mixed> {
 		$value = $this->getBody()[$key];
 		if (!is_array($value)) {
 			throw new Exception\Request\InvalidRequestParamException('Invalid parameter for key '.$key);
