@@ -3,11 +3,9 @@ namespace Usox\Sharesta;
 
 use function Facebook\FBExpect\expect;
 
-class ApiFactoryTest extends \Facebook\HackTest\HackTestCase {
+class ApiFactoryTest extends \Facebook\HackTest\HackTest {
 
-	/**
-	 * @dataProvider provideFactoryMethods
-	 */
+	<<DataProvider('provideFactoryMethods')>>
 	public function testCreationMethodsReturnInstances<T>(
 		string $method_name,
 		classname<T> $expected_class_name,

@@ -3,7 +3,7 @@ namespace Usox\Sharesta;
 
 use function Facebook\FBExpect\expect;
 
-class ResponseTest extends \Facebook\HackTest\HackTestCase {
+class ResponseTest extends \Facebook\HackTest\HackTest {
 
 	public function testSend500InvalidHttpStatus(): void {
 		$response = new Response(666,' AGGIAGGI');

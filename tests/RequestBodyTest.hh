@@ -72,7 +72,7 @@ class InputStreamWrapper {
 	}
 }
 
-class RequestBodyTest extends \Facebook\HackTest\HackTestCase {
+class RequestBodyTest extends \Facebook\HackTest\HackTest {
 
 	private ?RequestBody $request_body;
 

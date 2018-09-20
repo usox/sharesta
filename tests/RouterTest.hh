@@ -5,7 +5,7 @@ use function Facebook\FBExpect\expect;
 use function Usox\HackMock\{mock, prospect};
 use HH\Lib\Str;
 
-class RouterTest extends \Facebook\HackTest\HackTestCase {
+class RouterTest extends \Facebook\HackTest\HackTest {
 
 	private string $base_path = 'some-nice-path';
 
