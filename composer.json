@@ -11,15 +11,13 @@
         }
     ],
     "require": {
-        "hhvm": ">=3.27",
+        "hhvm": ">=3.28",
         "hhvm/type-assert": "^3",
-        "hhvm/hsl": "^3.27",
-        "usox/hackmock": "dev-master",
-        "hhvm/hacktest": "dev-master",
-        "hhvm/hhast": "^3.27"
+        "hhvm/hsl": "^3.28"
     },
     "require-dev": {
-        "facebook/fbexpect": "^2"
+        "usox/hackmock": "dev-master",
+        "hhvm/hhast": "^3.28"
     },
     "autoload": {
         "psr-4": {
