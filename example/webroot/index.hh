@@ -1,4 +1,4 @@
-<?hh // partial
+<?hh // strict
 namespace Usox\Sharesta\Example;
 
 require_once '../../vendor/autoload.php';
@@ -45,17 +45,21 @@ class Routes implements RoutesInterface {
 	}
 }
 
-function init() {
+<<__Entrypoint>>
+function main(): noreturn {
+	/* HH_IGNORE_ERROR[2050] */ $get_vars = dict($_GET);
+	/* HH_IGNORE_ERROR[2050] */ $server_vars = dict($_SERVER);
 	$factory = new ApiFactory();
 
 	$router = $factory->createRouter(
-		dict($_SERVER),
-		dict($_GET)
+		$server_vars,
+		$get_vars
 	);
 
 	$routes = new Routes();
 	$routes->registerRoutes($router);
 
 	$router->route('/example/webroot/index.hh');
+
+	die(0);
 }
-init();

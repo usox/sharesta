@@ -64,10 +64,19 @@ final class Routes implements Usox\Sharesta\RoutesInterface {
 Setup sharesta, register your routes and let the application controller handle your requests.
 
 ```php
+<?hh // strict
+
+require_once 'vendor/autoload.php';
+
+<<__Entrypoint>>
+function main(): noreturn {
+	/* HH_IGNORE_ERROR[2050] */ $get_vars = dict($_GET);
+	/* HH_IGNORE_ERROR[2050] */ $server_vars = dict($_SERVER);
+
     $factory = new Usox\Sharesta\ApiFactory();
     $router = $factory->createRouter(
-        dict($_SERVER),
-        dict($_GET)
+        $server_vars,
+        $get_vars
     );
 
     $routes = new Routes();
@@ -76,6 +85,9 @@ Setup sharesta, register your routes and let the application controller handle y
     $router->route(
         '' // path to the file. Leave it empty if your server configuration defaults to index.hh
     );
+
+    die(0);
+}
 ```
 
 ## Example
