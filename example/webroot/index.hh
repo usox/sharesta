@@ -1,65 +1,52 @@
-<?hh // strict
+<?hh // strict 
+
 namespace Usox\Sharesta\Example;
 
 require_once '../../vendor/hh_autoload.hh';
 
-use Usox\Sharesta\ApiFactory;
-use Usox\Sharesta\RequestInterface;
-use Usox\Sharesta\RouterInterface;
-use Usox\Sharesta\RoutesInterface;
+use Usox\Sharesta\Sharesta;
+use type Facebook\HackRouter\HttpMethod;
 
-class HomeRoute implements \JsonSerializable {
+final class SampleRouteHandler implements \JsonSerializable {
 
-	public function jsonSerialize(): string {
+	public function __construct(
+		private ImmMap<string, string> $params
+	) {
+	}
+
+	public function jsonSerialize(): mixed {
 		return 'Welcome home';
 	}
 }
 
-class GetSomeIdRoute implements \JsonSerializable {
+final class ParamRouteHandler implements \JsonSerializable {
 
-	private ?string $request_id;
-
-	public function __construct(private RequestInterface $request): void {
+	public function __construct(
+		private ImmMap<string, string> $params
+	) {
 	}
 
-	public function doSomeFancyMagic(): void {
-		$this->request_id = $this->request->getRouteParameters()['id'];
-	}
-
-	public function jsonSerialize(): string {
-		return 'Got '.(string) $this->request_id;
-	}
-}
-
-class Routes implements RoutesInterface {
-
-	public function registerRoutes(RouterInterface $router): void {
-		$router->get('/', (RequestInterface $request): \JsonSerializable ==> {
-			return new HomeRoute();
-		});
-		$router->get('/get_some/:id', (RequestInterface $request): \JsonSerializable ==> {
-			$route = new GetSomeIdRoute($request);
-			$route->doSomeFancyMagic();
-			return $route;
-		});
+	public function jsonSerialize(): mixed {
+		return 'Welcome '.$this->params->get('foobar');
 	}
 }
 
 <<__EntryPoint>>
-function main(): noreturn {
-	/* HH_IGNORE_ERROR[2050] */ $get_vars = dict($_GET);
-	/* HH_IGNORE_ERROR[2050] */ $server_vars = dict($_SERVER);
-	$factory = new ApiFactory();
+async function main(): Awaitable<noreturn> {
+	$sharesta = new Sharesta();
 
-	$router = $factory->createRouter(
-		$server_vars,
-		$get_vars
+	$sharesta->registerRoute(
+		HttpMethod::GET,
+		'/',
+		($params) ==> new SampleRouteHandler($params)
+	);
+	$sharesta->registerRoute(
+		HttpMethod::GET,
+		'/{foobar}',
+		($params) ==> new ParamRouteHandler($params)
 	);
 
-	$routes = new Routes();
-	$routes->registerRoutes($router);
-
-	$router->route('/example/webroot/index.hh');
+	await $sharesta->routeAsync();
 
 	die(0);
 }

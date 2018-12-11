@@ -1,7 +1,6 @@
-<?hh // strict
 namespace Usox\Sharesta\Exception;
 
 abstract class SharestaException extends \Exception {
 
-	abstract public function getHttpStatusCode(): int;
+  abstract public function getHttpStatusCode(): int;
 }
