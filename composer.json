@@ -11,17 +11,22 @@
         }
     ],
     "require": {
-        "hhvm": ">=3.28",
+        "hhvm": "^4.0",
         "hhvm/type-assert": "^3",
-        "hhvm/hsl": "^3.28"
+        "hhvm/hsl": "^4.0"
     },
     "require-dev": {
         "usox/hackmock": "^1",
-        "hhvm/hhast": "^3.28"
+        "hhvm/hhast": "^4.0"
     },
     "autoload": {
         "psr-4": {
 	        "Usox\\Sharesta\\": "src"
+        }
+    },
+    "config": {
+        "platform": {
+            "hhvm": "4.0.0"
         }
     }
 }
