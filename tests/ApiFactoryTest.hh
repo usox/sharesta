@@ -2,6 +2,7 @@
 namespace Usox\Sharesta;
 
 use function Facebook\FBExpect\expect;
+use type Facebook\HackTest\DataProvider;
 
 class ApiFactoryTest extends \Facebook\HackTest\HackTest {
 

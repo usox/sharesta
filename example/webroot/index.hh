@@ -1,7 +1,7 @@
 <?hh // strict
 namespace Usox\Sharesta\Example;
 
-require_once '../../vendor/autoload.php';
+require_once '../../vendor/hh_autoload.hh';
 
 use Usox\Sharesta\ApiFactory;
 use Usox\Sharesta\RequestInterface;
@@ -45,7 +45,7 @@ class Routes implements RoutesInterface {
 	}
 }
 
-<<__Entrypoint>>
+<<__EntryPoint>>
 function main(): noreturn {
 	/* HH_IGNORE_ERROR[2050] */ $get_vars = dict($_GET);
 	/* HH_IGNORE_ERROR[2050] */ $server_vars = dict($_SERVER);
