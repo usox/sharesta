@@ -1,13 +1,14 @@
-namespace Usox\Sharesta;
+namespace Usox\Sharesta\Route;
 
 use type Facebook\HackRouter\HttpMethod;
+use type Usox\Sharesta\ResponderType;
 
-final class Route {
+final class Route implements RouteInterface {
 
   public function __construct(
     private HttpMethod $method,
     private string $path,
-    private ResponderType $responder
+    private ResponderType $responder,
   ) {
   }
 

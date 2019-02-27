@@ -7,7 +7,7 @@ use namespace HH\Lib\{C};
 final class Router extends BaseRouter<ResponderType> {
 
   public function __construct(
-    private vec<Route> $routes
+    private vec<Route\RouteInterface> $routes
   ) {}
 
   <<__Override>>
@@ -19,6 +19,10 @@ final class Router extends BaseRouter<ResponderType> {
       if (!C\contains_key($routes, $method)) {
         $routes[$method] = dict[];
       }
+
+      $path = $route->getPath();
+      $responder = $route->getResponder();
+
 
       $routes[$method][$route->getPath()] = $route->getResponder();
     }

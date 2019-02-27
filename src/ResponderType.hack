@@ -1,3 +1,10 @@
 namespace Usox\Sharesta;
 
-type ResponderType = (function (ImmMap<string, string>): \JsonSerializable);
+use type Facebook\Experimental\Http\Message\ServerRequestInterface;
+
+type ResponderType = (
+  function (
+    ImmMap<string, string>,
+    ServerRequestInterface
+  ): \JsonSerializable
+);
