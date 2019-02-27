@@ -12,15 +12,15 @@ use type Usox\Sharesta\Contract\SharestaApplicationInterface;
 
 final class SampleRouteHandler implements SharestaApplicationInterface {
 
-	public function __construct(
-		private ImmMap<string, string> $params,
+  public function __construct(
+    private ImmMap<string, string> $params,
     private ServerRequestInterface $server_request
-	) {
-	}
+  ) {
+  }
 
-	public function jsonSerialize(): mixed {
-		return 'Welcome home';
-	}
+  public function jsonSerialize(): mixed {
+    return 'Welcome home';
+  }
 
   public static function registerRoute(
     RouteBuilderInterface $route_builder
@@ -37,15 +37,15 @@ final class SampleRouteHandler implements SharestaApplicationInterface {
 
 final class ParamRouteHandler implements SharestaApplicationInterface {
 
-	public function __construct(
-		private ImmMap<string, string> $params,
+  public function __construct(
+    private ImmMap<string, string> $params,
     private ServerRequestInterface $server_request
-	) {
-	}
+  ) {
+  }
 
-	public function jsonSerialize(): mixed {
-		return 'Welcome '.$this->params->get('foobar');
-	}
+  public function jsonSerialize(): mixed {
+    return 'Welcome '.$this->params->get('foobar');
+  }
 
   public static function registerRoute(
     RouteBuilderInterface $route_builder
@@ -62,14 +62,14 @@ final class ParamRouteHandler implements SharestaApplicationInterface {
 
 <<__EntryPoint>>
 async function main(): Awaitable<noreturn> {
-	$sharesta = new Sharesta();
+  $sharesta = new Sharesta();
 
   $sharesta->registerRoutes(vec[
     SampleRouteHandler::class,
     ParamRouteHandler::class
   ]);
 
-	await $sharesta->routeAsync();
+  await $sharesta->routeAsync();
 
-	die(0);
+  die(0);
 }
