@@ -96,7 +96,7 @@ final class Router implements RouterInterface {
 			if (\preg_match('%^'.$route_pattern.'$%', $request_prepend.$requested_route, &$uri_params)) {
 
 				foreach ($uri_params as $key => $value) {
-					if (!is_numeric($key)) {
+					if (!\is_numeric($key)) {
 						$route_parameters[$key] = $value;
 					}
 				}

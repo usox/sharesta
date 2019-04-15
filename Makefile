@@ -1,5 +1,5 @@
 tests:force
-	hhvm vendor/bin/hacktest tests
+	hhvm vendor/bin/hacktest.hack tests
 
 serve:force
 	hhvm -m s -p 8080

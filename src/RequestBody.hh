@@ -46,7 +46,7 @@ final class RequestBody implements RequestBodyInterface {
 
 	public function getAsVec(string $key): vec<mixed> {
 		$value = $this->getBody()[$key];
-		if (!is_array($value)) {
+		if (!\is_array($value)) {
 			throw new Exception\Request\InvalidRequestParamException('Invalid parameter for key '.$key);
 		}
 		return vec($value);
@@ -54,7 +54,7 @@ final class RequestBody implements RequestBodyInterface {
 
 	public function getAsDict(string $key): dict<string, mixed> {
 		$value = $this->getBody()[$key];
-		if (!is_array($value)) {
+		if (!\is_array($value)) {
 			throw new Exception\Request\InvalidRequestParamException('Invalid parameter for key '.$key);
 		}
 		return dict($value);
