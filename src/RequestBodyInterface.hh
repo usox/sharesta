@@ -1,7 +1,11 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
+use namespace HH\Lib\Experimental\IO;
+
 interface RequestBodyInterface {
+
+  public function useIO(IO\ReadHandle $input): this;
 
 	public function getBody(): dict<string, mixed>;
 

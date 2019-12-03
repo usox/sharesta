@@ -5,91 +5,21 @@ use function Facebook\FBExpect\expect;
 use HH\Lib\{Str, Math};
 use Facebook\TypeAssert\UnsupportedTypeException;
 
-class InputStreamWrapper {
-
-	public static ?InputStreamWrapper $singleton;
-
-	private int $index = 0;
-
-	private string $data = '';
-
-	public function read(int $count): string {
-		$length = Math\minva($count, Str\length($this->data) - $this->index);
-		$data = Str\slice($this->data, $this->index);
-		$this->index = $this->index + $length;
-		return $data;
-	}
-
-	public function eof(): bool {
-		return $this->index >= Str\length($this->data) ? true : false;
-	}
-
-	public function write(string $data): void {
-		$this->index = 0;
-		$this->data = $data;
-	}
-
-	public function stream_open(
-		string $path,
-		string $mode,
-		int $options,
-		?string $opened_path
-	): bool {
-		return true;
-	}
-
-	public function stream_close(): void {
-	}
-
-	public function stream_stat(): array<string, string> {
-		return array();
-	}
-
-	public function stream_flush(): bool {
-		return true;
-	}
-
-	private function getSingleton(): InputStreamWrapper {
-		if (static::$singleton === null) {
-			static::$singleton = new InputStreamWrapper();
-		}
-		return static::$singleton;
-	}
-
-	public function stream_read(int $count): string {
-		return $this->getSingleton()->read($count);
-	}
-
-	public function stream_eof(): bool {
-		return $this->getSingleton()->eof();
-	}
-
-	public function stream_write(string $data): void {
-		$this->getSingleton()->write($data);
-	}
-
-	public function unlink(): void {
-	}
-}
-
 class RequestBodyTest extends \Facebook\HackTest\HackTest {
 
-	private ?RequestBody $request_body;
+	<<__LateInit>> private RequestBody $request_body;
+
 
 	private function setUp(): void {
-		\stream_wrapper_unregister('php');
-		\stream_wrapper_register('php', InputStreamWrapper::class);
 		$this->request_body = new RequestBody();
 	}
 
 	public function testWithoutJsonDataThrowsException(): void {
-		$this->setUp();
-
-		\file_put_contents('php://input', 'absolutly-no-json');
+    $this->fillBodyWithString('absolutly-no-json');
 
 		expect(
 			function () {
-				$this->request_body?->getBody();
+        $this->with();
 			}
 		)
 		->toThrow(
@@ -116,7 +46,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 		$this->fillBody(['data' => 123]);
 
 		expect(
-			() ==> $this->request_body?->getAsString('data')
+			() ==> $this->request_body->getAsString('data')
 		)
 		->toThrow(
 			Exception\Request\InvalidRequestParamException::class
@@ -129,7 +59,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 		$this->fillBody(['data' => $expectation]);
 
 		expect(
-			$this->request_body?->getAsString('data')
+			$this->request_body->getAsString('data')
 		)
 		->toBeSame($expectation);
 	}
@@ -139,7 +69,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 
 		expect(
 			function() {
-				$this->request_body?->getAsInt('data');
+				$this->request_body->getAsInt('data');
 			}
 		)
 		->toThrow(
@@ -153,7 +83,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 		$this->fillBody(['data' => $expectation]);
 
 		expect(
-			$this->request_body?->getAsInt('data')
+			$this->request_body->getAsInt('data')
 		)
 		->toBeSame($expectation);
 	}
@@ -163,7 +93,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 
 		expect(
 			function() {
-				$this->request_body?->getAsBool('data');
+				$this->request_body->getAsBool('data');
 			}
 		)
 		->toThrow(
@@ -177,7 +107,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 		$this->fillBody(['data' => $expectation]);
 
 		expect(
-			$this->request_body?->getAsBool('data')
+			$this->request_body->getAsBool('data')
 		)
 		->toBeSame($expectation);
 	}
@@ -185,7 +115,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	public function testGetAsVecThrowsExceptionOnNonArray(): void {
 		$this->fillBody(['data' => 'BOOM']);
 
-		expect(() ==> $this->request_body?->getAsVec('data'))
+		expect(() ==> $this->request_body->getAsVec('data'))
 		->toThrow(
 			Exception\Request\InvalidRequestParamException::class
 		);
@@ -197,7 +127,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 		$this->fillBody(['data' => $data]);
 
 		expect(
-			$this->request_body?->getAsVec('data')
+			$this->request_body->getAsVec('data')
 		)
 		->toBeSame(vec($data));
 	}
@@ -207,7 +137,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 
 		expect(
 			function () {
-				$this->request_body?->getAsDict('data');
+				$this->request_body->getAsDict('data');
 			}
 		)
 		->toThrow(
@@ -221,19 +151,27 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 		$this->fillBody(['data' => $data]);
 
 		expect(
-			$this->request_body?->getAsDict('data')
+			$this->request_body->getAsDict('data')
 		)
 		->toBeSame(dict($data));
 	}
 
-	private function getRequestBody(array<string, mixed>$input): ?dict<string, mixed> {
+	private function getRequestBody(array<string, mixed>$input): dict<string, mixed> {
 		$this->fillBody($input);
 
-		return $this->request_body?->getBody();	
+		return $this->with();	
 	}
 
 	private function fillBody(array<string, mixed> $body): void {
-		$this->setUp();
-		\file_put_contents('php://input', \json_encode($body));
+		 $this->fillBodyWithString(\json_encode($body));
 	}
+
+  private function fillBodyWithString(string $input): void{
+    $this->setUp();
+    $this->request_body->useIO(new _Private\MockIOHandle($input));
+  }
+
+  private function with(): dict<string, mixed>{
+    return $this->request_body->getBody();
+  }
 }
