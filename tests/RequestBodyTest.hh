@@ -19,7 +19,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 
 		expect(
 			function () {
-        $this->with();
+        $this->request_body->getBody();
 			}
 		)
 		->toThrow(
@@ -159,7 +159,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	private function getRequestBody(array<string, mixed>$input): dict<string, mixed> {
 		$this->fillBody($input);
 
-		return $this->with();	
+		return $this->request_body->getBody();	
 	}
 
 	private function fillBody(array<string, mixed> $body): void {
@@ -169,9 +169,5 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
   private function fillBodyWithString(string $input): void{
     $this->setUp();
     $this->request_body->useIO(new _Private\MockIOHandle($input));
-  }
-
-  private function with(): dict<string, mixed>{
-    return $this->request_body->getBody();
   }
 }

@@ -9,9 +9,11 @@ final class RequestBody implements RequestBodyInterface {
   private ?dict<string, mixed> $getBodyCache;
   private ?IO\ReadHandle $input;
 
-  public function useIO(IO\ReadHandle $input): this{
-    $this->input = $input;
-    $this->getBodyCache = null;
+  public function useIO(?IO\ReadHandle $input): this{
+    if($input !== $this->input){
+      $this->input = $input;
+      $this->getBodyCache = null;
+    }
     return $this;
   }
 
