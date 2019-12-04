@@ -3,7 +3,6 @@
 namespace Usox\Sharesta\_Private;
 
 use namespace HH\Lib\Experimental\IO;
-use namespace HH\Lib\Str;
 
 class MockIOHandle implements IO\ReadHandle {
   public function __construct(private string $contents) {}
@@ -27,8 +26,8 @@ class MockIOHandle implements IO\ReadHandle {
     );
   }
   public function readLineAsync(
-    ?int $max_bytes = null,
-    ?float $timeout_seconds = null,
+    ?int $_max_bytes = null,
+    ?float $_timeout_seconds = null,
   ): Awaitable<string> {
     throw new \InvalidOperationException(
       'This class is meant to be injected into tests. Do not use!',

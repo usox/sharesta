@@ -1,3 +1,4 @@
 composer.lock
 vendor
 www.pid
+**/*hhast.parser-cache
