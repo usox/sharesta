@@ -2,12 +2,28 @@
 namespace Usox\Sharesta;
 
 use namespace Facebook\TypeAssert;
+use namespace HH\Lib\Experimental\IO;
 
 final class RequestBody implements RequestBodyInterface {
 
-	<<__Memoize>>
+  private ?dict<string, mixed> $getBodyCache;
+  private ?IO\ReadHandle $input;
+
+  public function useIO(?IO\ReadHandle $input): this{
+    if($input !== $this->input){
+      $this->input = $input;
+      $this->getBodyCache = null;
+    }
+    return $this;
+  }
+
 	public function getBody(): dict<string,mixed> {
-		$body = \file_get_contents('php://input');
+    if($this->getBodyCache is nonnull){
+      return $this->getBodyCache;
+    }
+    $req_input = IO\request_input();
+    $body = $this->input?->rawReadBlocking() ?? $req_input->rawReadBlocking();
+
 		if ($body === '') {
 			return dict([]);
 		}
@@ -57,6 +73,7 @@ final class RequestBody implements RequestBodyInterface {
 		if (!\is_array($value)) {
 			throw new Exception\Request\InvalidRequestParamException('Invalid parameter for key '.$key);
 		}
+    /*HH_FIXME[4110] Can I have integer keys?*/
 		return dict($value);
 	}
 }
