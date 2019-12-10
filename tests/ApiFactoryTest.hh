@@ -14,14 +14,14 @@ class ApiFactoryTest extends \Facebook\HackTest\HackTest {
 	): void {
 		$api_factory = new ApiFactory();
 		expect(
-			\call_user_func_array([$api_factory, $method_name], $parameter)
+			\call_user_func_array(varray[$api_factory, $method_name], $parameter)
 		)
 		->toBeInstanceOf($expected_class_name);
 	}
 
 	public function provideFactoryMethods(): vec<mixed> {
 		return vec[
-			tuple('createRouter', Router::class, vec[dict([]), dict([])]),
+			tuple('createRouter', Router::class, vec[dict[], dict[]]),
 			tuple('createResponse', Response::class, vec[666, 'roedlbroem']),
 		];
 	}

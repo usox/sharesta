@@ -25,7 +25,7 @@ final class RequestBody implements RequestBodyInterface {
     $body = $this->input?->rawReadBlocking() ?? $req_input->rawReadBlocking();
 
 		if ($body === '') {
-			return dict([]);
+			return dict[];
 		}
 		$json_decoded_body = \json_decode($body, true);
 

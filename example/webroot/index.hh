@@ -1,6 +1,7 @@
 <?hh // strict
 namespace Usox\Sharesta\Example;
 
+/* HH_FIXME[1002] Top level require, because the autoloader is required for the classes below. */
 require_once '../../vendor/hh_autoload.hh';
 
 use Usox\Sharesta\ApiFactory;

@@ -18,9 +18,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
     $this->fillBodyWithString('absolutly-no-json');
 
 		expect(
-			function () {
-        $this->request_body->getBody();
-			}
+      () ==> $this->request_body->getBody()
 		)
 		->toThrow(
 			Exception\RequestException::class
@@ -30,12 +28,12 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	public function testWithEmptyBodyReturnsEmptyDict(): void {
 		$this->setUp();
 
-		expect($this->getRequestBody([]))->toBeSame(dict([]));
+		expect($this->getRequestBody(darray[]))->toBeSame(dict[]);
 	}
 
 	public function testWithJsonDataReturnsDict(): void {
 		$this->setUp();
-		$request_data = ['data' => 'really'];
+		$request_data = darray['data' => 'really'];
 		$data = $this->getRequestBody($request_data);
 
 		expect($data)
@@ -43,7 +41,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	}
 
 	public function testGetAsStringFailsWithNonString(): void {
-		$this->fillBody(['data' => 123]);
+		$this->fillBody(darray['data' => 123]);
 
 		expect(
 			() ==> $this->request_body->getAsString('data')
@@ -56,7 +54,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	public function testGetAsStringReturnsString(): void {
 		$expectation = 'some-string';
 
-		$this->fillBody(['data' => $expectation]);
+		$this->fillBody(darray['data' => $expectation]);
 
 		expect(
 			$this->request_body->getAsString('data')
@@ -65,12 +63,10 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	}
 
 	public function testGetAsIntFailsWithNonInt(): void {
-		$this->fillBody(['data' => 'we-want-snoo-snoo']);
+		$this->fillBody(darray['data' => 'we-want-snoo-snoo']);
 
 		expect(
-			function() {
-				$this->request_body->getAsInt('data');
-			}
+		  () ==> $this->request_body->getAsInt('data')
 		)
 		->toThrow(
 			Exception\Request\InvalidRequestParamException::class
@@ -80,7 +76,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	public function testGetAsIntReturnsInt(): void {
 		$expectation = 123;
 
-		$this->fillBody(['data' => $expectation]);
+		$this->fillBody(darray['data' => $expectation]);
 
 		expect(
 			$this->request_body->getAsInt('data')
@@ -89,12 +85,10 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	}
 
 	public function testGetAsIntFailsWithNonBool(): void {
-		$this->fillBody(['data' => 'mister-noob-noob']);
+		$this->fillBody(darray['data' => 'mister-noob-noob']);
 
 		expect(
-			function() {
-				$this->request_body->getAsBool('data');
-			}
+		  () ==> $this->request_body->getAsBool('data')
 		)
 		->toThrow(
 			Exception\Request\InvalidRequestParamException::class
@@ -104,7 +98,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	public function testGetAsBoolReturnsBool(): void {
 		$expectation = true;
 
-		$this->fillBody(['data' => $expectation]);
+		$this->fillBody(darray['data' => $expectation]);
 
 		expect(
 			$this->request_body->getAsBool('data')
@@ -113,7 +107,7 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	}
 
 	public function testGetAsVecThrowsExceptionOnNonArray(): void {
-		$this->fillBody(['data' => 'BOOM']);
+		$this->fillBody(darray['data' => 'BOOM']);
 
 		expect(() ==> $this->request_body->getAsVec('data'))
 		->toThrow(
@@ -122,9 +116,9 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	}
 
 	public function testGetAsVecReturnsVector(): void {
-		$data = ['I-will-be-ignored' => 'Me-not'];
+		$data = darray['I-will-be-ignored' => 'Me-not'];
 
-		$this->fillBody(['data' => $data]);
+		$this->fillBody(darray['data' => $data]);
 
 		expect(
 			$this->request_body->getAsVec('data')
@@ -133,12 +127,10 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	}
 
 	public function testGetAsDictThrowsExceptionOnNonArray(): void {
-		$this->fillBody(['data' => 'BOOM']);
+		$this->fillBody(darray['data' => 'BOOM']);
 
 		expect(
-			function () {
-				$this->request_body->getAsDict('data');
-			}
+		  () ==> $this->request_body->getAsDict('data')
 		)
 		->toThrow(
 			Exception\Request\InvalidRequestParamException::class
@@ -146,9 +138,9 @@ class RequestBodyTest extends \Facebook\HackTest\HackTest {
 	}
 
 	public function testGetAsDictReturnsDict(): void {
-		$data = ['da-key' => 'da-value'];
+		$data = darray['da-key' => 'da-value'];
 
-		$this->fillBody(['data' => $data]);
+		$this->fillBody(darray['data' => $data]);
 
 		expect(
 			$this->request_body->getAsDict('data')
