@@ -7,14 +7,14 @@ class RequestTest extends \Facebook\HackTest\HackTest {
 
 	public function testRequestEstablishesPropertiesOnCreation(): void {
 		$request = new Request(
-			dict([
+			dict[
 				'REQUEST_URI' => '/api/test/sub/1',
 				'REQUEST_METHOD' => 'GET'
-			]),
-			dict([
+      ],
+			dict[
 				'a' => '1',
 				'b' => '2'
-			]),
+			],
 			new RequestBody()
 		);
 		$uri_values = $request->getUriValues();

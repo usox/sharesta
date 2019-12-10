@@ -75,7 +75,7 @@ final class Router implements RouterInterface {
 	private function matchRoute(string $base_path): \JsonSerializable {
 		$requested_route = $this->request->getRoute($base_path);
 		$http_method = $this->request->getHttpMethod();
-		$route_parameters = dict([]);
+		$route_parameters = dict[];
 
 		foreach ($this->routes as $route => $callback) {
 			// if the route also defines a HTTP method, use it as prefix for the lookup
@@ -92,7 +92,7 @@ final class Router implements RouterInterface {
 				$route
 			);
 
-			$uri_params = [];
+			$uri_params = darray[];
 			if (\preg_match_with_matches('%^'.$route_pattern.'$%', $request_prepend.$requested_route, inout $uri_params)) {
 
 				foreach ($uri_params as $key => $value) {

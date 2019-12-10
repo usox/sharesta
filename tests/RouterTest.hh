@@ -48,7 +48,7 @@ class RouterTest extends \Facebook\HackTest\HackTest {
 			$request
 		);
 
-		$router->register('users/:id/:field', function($request) use ($result) { return $result; });
+		$router->register('users/:id/:field', $_ ==> $result);
 		$router->addResponseHeader($header);
 
 		$router->route($this->base_path);
@@ -109,7 +109,7 @@ class RouterTest extends \Facebook\HackTest\HackTest {
 			$request
 		);
 
-		$router->register('foo/:id/:field', function($request) use ($result) { return $result; });
+		$router->register('foo/:id/:field', $_ ==> $result);
 
 		$router->route($this->base_path);
 	}
@@ -155,7 +155,7 @@ class RouterTest extends \Facebook\HackTest\HackTest {
 				$request
 			);
 
-			$router->register($route_base.'/:id/:field', function($request) use ($result) { return $result; }, $method);
+			$router->register($route_base.'/:id/:field', $_ ==> $result, $method);
 
 			$router->route($this->base_path);
 		};

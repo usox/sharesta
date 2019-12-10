@@ -35,9 +35,11 @@ final class Response implements ResponseInterface {
 			$response_header,
 		);
 
+    $level = \error_reporting(0);
 		foreach ($response_header as $header) {
-			@\header($header);
+			\header($header);
 		}
+    \error_reporting($level);
 
 		echo $this->body;
 	}
