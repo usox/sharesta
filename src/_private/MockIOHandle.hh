@@ -2,7 +2,7 @@
 
 namespace Usox\Sharesta\_Private;
 
-use namespace HH\Lib\Experimental\IO;
+use namespace HH\Lib\IO;
 
 class MockIOHandle implements IO\ReadHandle {
   public function __construct(private string $contents) {}

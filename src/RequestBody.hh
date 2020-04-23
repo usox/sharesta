@@ -2,7 +2,7 @@
 namespace Usox\Sharesta;
 
 use namespace Facebook\TypeAssert;
-use namespace HH\Lib\Experimental\IO;
+use namespace HH\Lib\IO;
 
 final class RequestBody implements RequestBodyInterface {
 
