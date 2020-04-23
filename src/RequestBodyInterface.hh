@@ -1,7 +1,7 @@
 <?hh // strict
 namespace Usox\Sharesta;
 
-use namespace HH\Lib\Experimental\IO;
+use namespace HH\Lib\IO;
 
 interface RequestBodyInterface {
 
